@@ -5,9 +5,9 @@ using System.Runtime.CompilerServices;
 // Change them to the values specific to your project.
 
 [assembly: AssemblyTitle("CabrioConfig")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Cabrio config.xml utility")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("UCF - SFA")]
+[assembly: AssemblyCompany("NA")]
 [assembly: AssemblyProduct("")]
 [assembly: AssemblyCopyright("2013 James Padel")]
 [assembly: AssemblyTrademark("")]

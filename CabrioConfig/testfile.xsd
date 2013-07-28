@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="cabrio-config" xmlns="http://www.w3schools.com" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+	<xs:element name="cabrio-config" msdata:IsDataSet="true" msdata:Locale="en-US">
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="interface">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="full-screen" type="xs:string" minOccurs="0" />
+							<xs:element name="theme" type="xs:string" minOccurs="0" />
+							<xs:element name="screen" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="width" type="xs:string" minOccurs="0" />
+										<xs:element name="height" type="xs:string" minOccurs="0" />
+										<xs:element name="rotation" type="xs:string" minOccurs="0" />
+										<xs:element name="flip-horizontal" type="xs:string" minOccurs="0" />
+										<xs:element name="flip-vertical" type="xs:string" minOccurs="0" />
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="graphics" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="quality" type="xs:string" minOccurs="0" />
+										<xs:element name="max-image-width" type="xs:string" minOccurs="0" />
+										<xs:element name="max-image-height" type="xs:string" minOccurs="0" />
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="controls" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="locations">
+					<xs:complexType>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="emulators">
+					<xs:complexType>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="game-list">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="name" type="xs:string" minOccurs="0" />
+							<xs:element name="games" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

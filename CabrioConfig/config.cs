@@ -135,18 +135,39 @@ namespace CabrioConfig
 		String filePath = "/home/jim/.cabrio/config.xml";
 		
 				
-		public int readconfig ()
+		public int ReadConfig ()
 		{
 			dsConfig.ReadXml (filePath);
 			
 			return 1;
 		}
 		
-		public int writeconfig ()
+		public int WriteConfig ()
 		{
+			Console.WriteLine (dsConfig.Tables[4].TableName.ToString ());
+			int indexCount = 0;
+			foreach (DataTable tableLoop in dsConfig.Tables)
+			{
+				Console.WriteLine ("Table: (" + indexCount + ") " + tableLoop.TableName.ToString ());
+				indexCount++;
+			}
 			
+			indexCount = 0;
+			foreach (DataRelation relationLoop in dsConfig.Relations)
+			{
+				Console.WriteLine ("Relation: (" + indexCount + ") " + relationLoop.RelationName.ToString ());
+				indexCount++;
+			}
+			dsConfig.WriteXml ("/tmp/testfile.xml");
+			dsConfig.WriteXmlSchema ("/tmp/schema.xml");
 			return 1;
 		}
+		
+		public int AddGame ()
+		{
+			return 1;
+		}
+		
 		
 	}
 }

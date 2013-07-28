@@ -1,5 +1,6 @@
 using System;
 using Gtk;
+using CabrioConfig;
 
 public partial class MainWindow: Gtk.Window
 {	
@@ -12,5 +13,12 @@ public partial class MainWindow: Gtk.Window
 	{
 		Application.Quit ();
 		a.RetVal = true;
+	}
+
+	protected void OnBtnTestSchemaClicked (object sender, System.EventArgs e)
+	{
+		config myConfig = new config();
+		myConfig.ReadConfig ();
+		myConfig.WriteConfig ();
 	}
 }

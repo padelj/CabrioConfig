@@ -74,4 +74,9 @@
     <Compile Include="config.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <None Include="testfile.xsd" />
+    <None Include="testfile.xml" />
+    <None Include="TablesAndRelations.txt" />
+  </ItemGroup>
 </Project>
