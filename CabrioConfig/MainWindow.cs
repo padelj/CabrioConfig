@@ -15,10 +15,27 @@ public partial class MainWindow: Gtk.Window
 		a.RetVal = true;
 	}
 
-	protected void OnBtnTestSchemaClicked (object sender, System.EventArgs e)
+
+	protected void OnBtnMAMEBrowseClicked (object sender, System.EventArgs e)
 	{
-		config myConfig = new config();
-		myConfig.ReadConfig ();
-		myConfig.WriteConfig ();
+		Gtk.FileChooserDialog myFileChooser = new Gtk.FileChooserDialog ("MAME Directory",this
+		                                                                 ,FileChooserAction.SelectFolder
+		                                                                 ,"Cancel",ResponseType.Cancel
+		                                                                 ,"Open",ResponseType.Accept);
+		if (myFileChooser.Run () == (int)ResponseType.Accept)
+		{
+			txtMAMEPath.Text = myFileChooser.Filename;
+			myFileChooser.Destroy ();
+		}
+		else
+		{
+			myFileChooser.Destroy ();	
+		}
+		
+	}
+
+	protected void OnBtnROMSBrowseClicked (object sender, System.EventArgs e)
+	{
+		throw new System.NotImplementedException ();
 	}
 }

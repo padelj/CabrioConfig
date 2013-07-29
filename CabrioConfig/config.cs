@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Xml;
 using System.Data;
+using System.Data.Common;
 
 
 namespace CabrioConfig
@@ -131,9 +132,10 @@ namespace CabrioConfig
 		private const string config_label_select			= "select";
 		private const string config_label_lists				= "lists";
 		
-		DataSet dsConfig = new DataSet("config");
+		DataSet dsConfig = new DataSet();
+		//DataSet dsMAMEXML = new DataSet();
 		String filePath = "/home/jim/.cabrio/config.xml";
-		
+		String MAMEPath = "/home/jim/.mame/mameinfo.xml";
 				
 		public int ReadConfig ()
 		{
@@ -144,22 +146,45 @@ namespace CabrioConfig
 		
 		public int WriteConfig ()
 		{
-			Console.WriteLine (dsConfig.Tables[4].TableName.ToString ());
-			int indexCount = 0;
-			foreach (DataTable tableLoop in dsConfig.Tables)
+			//int indexCount = 0;
+			foreach (DataRow paramLoop in dsConfig.Tables["game"].Rows)
 			{
-				Console.WriteLine ("Table: (" + indexCount + ") " + tableLoop.TableName.ToString ());
-				indexCount++;
+				Console.WriteLine (paramLoop["name"].ToString ());
+				Console.WriteLine (paramLoop["rom-image"].ToString ());
 			}
-			
-			indexCount = 0;
-			foreach (DataRelation relationLoop in dsConfig.Relations)
-			{
-				Console.WriteLine ("Relation: (" + indexCount + ") " + relationLoop.RelationName.ToString ());
-				indexCount++;
-			}
+
 			dsConfig.WriteXml ("/tmp/testfile.xml");
-			dsConfig.WriteXmlSchema ("/tmp/schema.xml");
+			dsConfig.WriteXmlSchema ("/tmp/schema.xsd");
+			return 1;
+		}
+		
+		public int ReadMAME (String txtGameName)
+		{
+			//dsMAMEXML.ReadXml (MAMEPath);
+			
+			//Console.WriteLine (dsMAMEXML.Tables.Count);
+			//Console.WriteLine (dsMAMEXML.Tables["game"].Rows.Count);
+			//Console.WriteLine (dsMAMEXML.Tables["game"].Rows[1].ItemArray); 
+			
+			/* Start of XPath working sample.
+			XmlDocument myXMLDoc = new XmlDocument();
+			myXMLDoc.Load (MAMEPath);
+			
+			String gameDesc = myXMLDoc.SelectSingleNode ("/mame/game[@name='" + txtGameName + "']/description").InnerText;
+			Console.WriteLine (gameDesc);  
+			
+			end of sample */
+			
+			/* Sample directory
+			
+			string [] dirList = Directory.GetFiles ("/home/jim/.mame/roms/");
+			
+			foreach (string myList in dirList)
+			{
+				Console.WriteLine (Path.GetFileNameWithoutExtension (myList));
+			}
+			*/
+			
 			return 1;
 		}
 		
