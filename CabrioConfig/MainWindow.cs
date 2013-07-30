@@ -18,10 +18,12 @@ public partial class MainWindow: Gtk.Window
 
 	protected void OnBtnMAMEBrowseClicked (object sender, System.EventArgs e)
 	{
-		Gtk.FileChooserDialog myFileChooser = new Gtk.FileChooserDialog ("MAME Directory",this
-		                                                                 ,FileChooserAction.SelectFolder
-		                                                                 ,"Cancel",ResponseType.Cancel
-		                                                                 ,"Open",ResponseType.Accept);
+		Gtk.FileChooserDialog myFileChooser = new 
+			Gtk.FileChooserDialog ("MAME Directory",this
+			                       ,FileChooserAction.SelectFolder
+			                       ,"Cancel",ResponseType.Cancel
+			                       ,"Open",ResponseType.Accept);
+		
 		if (myFileChooser.Run () == (int)ResponseType.Accept)
 		{
 			txtMAMEPath.Text = myFileChooser.Filename;
@@ -35,6 +37,26 @@ public partial class MainWindow: Gtk.Window
 	}
 
 	protected void OnBtnROMSBrowseClicked (object sender, System.EventArgs e)
+	{
+		throw new System.NotImplementedException ();
+	}
+
+	protected void OnOpenActionActivated (object sender, System.EventArgs e)
+	{
+		throw new System.NotImplementedException ();
+	}
+
+	protected void OnOpenAction1Activated (object sender, System.EventArgs e)
+	{
+		throw new System.NotImplementedException ();
+	}
+
+	protected void OnQuitActionActivated (object sender, System.EventArgs e)
+	{
+		throw new System.NotImplementedException ();
+	}
+
+	protected void OnBtnSnapBrowseClicked (object sender, System.EventArgs e)
 	{
 		throw new System.NotImplementedException ();
 	}

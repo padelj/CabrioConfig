@@ -133,9 +133,8 @@ namespace CabrioConfig
 		private const string config_label_lists				= "lists";
 		
 		DataSet dsConfig = new DataSet();
-		//DataSet dsMAMEXML = new DataSet();
+
 		String filePath = "/home/jim/.cabrio/config.xml";
-		String MAMEPath = "/home/jim/.mame/mameinfo.xml";
 				
 		public int ReadConfig ()
 		{
@@ -158,13 +157,16 @@ namespace CabrioConfig
 			return 1;
 		}
 		
-		public int ReadMAME (String txtGameName)
+		public int ReadMAME ()
 		{
-			//dsMAMEXML.ReadXml (MAMEPath);
 			
-			//Console.WriteLine (dsMAMEXML.Tables.Count);
-			//Console.WriteLine (dsMAMEXML.Tables["game"].Rows.Count);
-			//Console.WriteLine (dsMAMEXML.Tables["game"].Rows[1].ItemArray); 
+			/* Dataset version
+			dsMAMEXML.ReadXml (MAMEPath);
+			
+			Console.WriteLine (dsMAMEXML.Tables.Count);
+			Console.WriteLine (dsMAMEXML.Tables["game"].Rows.Count);
+			Console.WriteLine (dsMAMEXML.Tables["game"].Rows[1].ItemArray); 
+			*/
 			
 			/* Start of XPath working sample.
 			XmlDocument myXMLDoc = new XmlDocument();
@@ -188,7 +190,17 @@ namespace CabrioConfig
 			return 1;
 		}
 		
+		public int LoadConfig ()
+		{
+			return 1;
+		}
+		
 		public int AddGame ()
+		{
+			return 1;
+		}
+		
+		public int DelGame ()
 		{
 			return 1;
 		}

@@ -7,6 +7,7 @@
 *.DS_Store
 
 # Visual Studio / MonoDevelop
+*.csproj
 *.sln
 *.[Oo]bj
 *.exe

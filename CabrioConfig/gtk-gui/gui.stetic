@@ -14,6 +14,7 @@
         <property name="Type">Action</property>
         <property name="Label" translatable="yes" />
         <property name="StockId">gtk-open</property>
+        <signal name="Activated" handler="OnOpenActionActivated" />
       </action>
       <action id="saveAction">
         <property name="Type">Action</property>
@@ -71,6 +72,7 @@
         <property name="Label" translatable="yes">_Open</property>
         <property name="ShortLabel" translatable="yes">_Open</property>
         <property name="StockId">gtk-open</property>
+        <signal name="Activated" handler="OnOpenAction1Activated" />
       </action>
       <action id="saveAction1">
         <property name="Type">Action</property>
@@ -89,6 +91,7 @@
         <property name="Label" translatable="yes">_Quit</property>
         <property name="ShortLabel" translatable="yes">_Quit</property>
         <property name="StockId">gtk-quit</property>
+        <signal name="Activated" handler="OnQuitActionActivated" />
       </action>
       <action id="HelpAction">
         <property name="Type">Action</property>
@@ -261,6 +264,58 @@
                   </widget>
                   <packing>
                     <property name="Position">2</property>
+                    <property name="AutoSize">True</property>
+                    <property name="Expand">False</property>
+                    <property name="Fill">False</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.HBox" id="hbox1">
+                    <property name="MemberName" />
+                    <property name="Spacing">6</property>
+                    <child>
+                      <widget class="Gtk.Label" id="label1">
+                        <property name="MemberName" />
+                        <property name="LabelProp" translatable="yes">Snap Path:</property>
+                      </widget>
+                      <packing>
+                        <property name="Position">0</property>
+                        <property name="AutoSize">True</property>
+                        <property name="Expand">False</property>
+                        <property name="Fill">False</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="Gtk.Entry" id="txtSnapsPath">
+                        <property name="MemberName" />
+                        <property name="CanFocus">True</property>
+                        <property name="IsEditable">True</property>
+                        <property name="InvisibleChar">•</property>
+                      </widget>
+                      <packing>
+                        <property name="Position">1</property>
+                        <property name="AutoSize">True</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="Gtk.Button" id="btnSnapBrowse">
+                        <property name="MemberName" />
+                        <property name="CanFocus">True</property>
+                        <property name="Type">TextOnly</property>
+                        <property name="Label" translatable="yes">...</property>
+                        <property name="UseUnderline">True</property>
+                        <signal name="Clicked" handler="OnBtnSnapBrowseClicked" />
+                      </widget>
+                      <packing>
+                        <property name="Position">2</property>
+                        <property name="AutoSize">True</property>
+                        <property name="Expand">False</property>
+                        <property name="Fill">False</property>
+                      </packing>
+                    </child>
+                  </widget>
+                  <packing>
+                    <property name="Position">3</property>
                     <property name="AutoSize">True</property>
                     <property name="Expand">False</property>
                     <property name="Fill">False</property>
