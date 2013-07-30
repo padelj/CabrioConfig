@@ -42,7 +42,7 @@ public partial class MainWindow
 	private global::Gtk.VBox vbox2;
 	private global::Gtk.HBox hbox2;
 	private global::Gtk.ScrolledWindow GtkScrolledWindow;
-	private global::Gtk.NodeView nodeview2;
+	private global::Gtk.NodeView nvGamesList;
 	private global::Gtk.VBox vbox5;
 	private global::Gtk.Alignment alignment5;
 	private global::Gtk.Button btnUp;
@@ -142,7 +142,7 @@ public partial class MainWindow
 		this.notebook2 = new global::Gtk.Notebook ();
 		this.notebook2.CanFocus = true;
 		this.notebook2.Name = "notebook2";
-		this.notebook2.CurrentPage = 0;
+		this.notebook2.CurrentPage = 1;
 		// Container child notebook2.Gtk.Notebook+NotebookChild
 		this.vbox6 = new global::Gtk.VBox ();
 		this.vbox6.Name = "vbox6";
@@ -230,7 +230,7 @@ public partial class MainWindow
 		// Container child hbox1.Gtk.Box+BoxChild
 		this.label1 = new global::Gtk.Label ();
 		this.label1.Name = "label1";
-		this.label1.LabelProp = global::Mono.Unix.Catalog.GetString ("Snap Path:");
+		this.label1.LabelProp = global::Mono.Unix.Catalog.GetString ("Snapshot Path:");
 		this.hbox1.Add (this.label1);
 		global::Gtk.Box.BoxChild w12 = ((global::Gtk.Box.BoxChild)(this.hbox1 [this.label1]));
 		w12.Position = 0;
@@ -281,10 +281,10 @@ public partial class MainWindow
 		this.GtkScrolledWindow.Name = "GtkScrolledWindow";
 		this.GtkScrolledWindow.ShadowType = ((global::Gtk.ShadowType)(1));
 		// Container child GtkScrolledWindow.Gtk.Container+ContainerChild
-		this.nodeview2 = new global::Gtk.NodeView ();
-		this.nodeview2.CanFocus = true;
-		this.nodeview2.Name = "nodeview2";
-		this.GtkScrolledWindow.Add (this.nodeview2);
+		this.nvGamesList = new global::Gtk.NodeView ();
+		this.nvGamesList.CanFocus = true;
+		this.nvGamesList.Name = "nvGamesList";
+		this.GtkScrolledWindow.Add (this.nvGamesList);
 		this.hbox2.Add (this.GtkScrolledWindow);
 		global::Gtk.Box.BoxChild w18 = ((global::Gtk.Box.BoxChild)(this.hbox2 [this.GtkScrolledWindow]));
 		w18.Position = 0;
@@ -414,5 +414,6 @@ public partial class MainWindow
 		this.btnMAMEBrowse.Clicked += new global::System.EventHandler (this.OnBtnMAMEBrowseClicked);
 		this.btnROMSBrowse.Clicked += new global::System.EventHandler (this.OnBtnROMSBrowseClicked);
 		this.btnSnapBrowse.Clicked += new global::System.EventHandler (this.OnBtnSnapBrowseClicked);
+		this.btnScan.Clicked += new global::System.EventHandler (this.OnBtnScanClicked);
 	}
 }

@@ -134,30 +134,17 @@ namespace CabrioConfig
 		
 		DataSet dsConfig = new DataSet();
 
-		String filePath = "/home/jim/.cabrio/config.xml";
+		String filePath = Environment.GetEnvironmentVariable ("HOME") + "/.cabrio/config.xml";
 				
-		public int ReadConfig ()
+		private int ReadConfig ()
 		{
 			dsConfig.ReadXml (filePath);
 			
 			return 1;
 		}
-		
-		public int WriteConfig ()
-		{
-			//int indexCount = 0;
-			foreach (DataRow paramLoop in dsConfig.Tables["game"].Rows)
-			{
-				Console.WriteLine (paramLoop["name"].ToString ());
-				Console.WriteLine (paramLoop["rom-image"].ToString ());
-			}
 
-			dsConfig.WriteXml ("/tmp/testfile.xml");
-			dsConfig.WriteXmlSchema ("/tmp/schema.xsd");
-			return 1;
-		}
-		
-		public int ReadMAME ()
+
+		private int ReadMAME ()
 		{
 			
 			/* Dataset version
@@ -189,10 +176,37 @@ namespace CabrioConfig
 			
 			return 1;
 		}
-		
-		public int LoadConfig ()
+		public int WriteConfig ()
 		{
+			/* write config test
+			int indexCount = 0;
+			foreach (DataRow paramLoop in dsConfig.Tables["game"].Rows)
+			{
+				Console.WriteLine (paramLoop["name"].ToString ());
+				Console.WriteLine (paramLoop["rom-image"].ToString ());
+			}
+
+			dsConfig.WriteXml ("/tmp/testfile.xml");
+			dsConfig.WriteXmlSchema ("/tmp/schema.xsd");
+			*/
+
 			return 1;
+		}
+		
+
+		public void LoadConfig (ref string [] configArray)
+		{
+			ReadConfig ();
+
+			foreach (DataRow myRows in dsConfig.Tables[tag_locations_location].Rows)
+			{
+				if (myRows[tag_type].ToString () == "screenshot")
+				{
+					configArray[2] = myRows[tag_directory].ToString (); //Screenshot location
+				}
+			}
+
+
 		}
 		
 		public int AddGame ()
