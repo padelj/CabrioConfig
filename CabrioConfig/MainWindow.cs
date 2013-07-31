@@ -107,10 +107,6 @@ public partial class MainWindow: Gtk.Window
 	protected void OnBtnScanClicked (object sender, EventArgs e)
 	{
 		statusbar1.Push (1,"Loading MAME file.  This will take some time.");
-		for (int i = 0;i<1000;i++)
-		{
-			this.Show ();
-		}
 
 		string [] dirList = Directory.GetFiles (txtROMSPath.Text);
 		Console.WriteLine (dirList.Length); //Directory count
