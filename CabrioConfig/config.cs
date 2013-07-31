@@ -197,6 +197,9 @@ namespace CabrioConfig
 		public void LoadConfig (ref string [] configArray)
 		{
 			ReadConfig ();
+			
+			configArray[0] = "/home/jim/.mame";			//Temporary for debug
+			configArray[1] = "/home/jim/.mame/roms";	//Temporary for debug
 
 			foreach (DataRow myRows in dsConfig.Tables[tag_locations_location].Rows)
 			{
@@ -205,10 +208,15 @@ namespace CabrioConfig
 					configArray[2] = myRows[tag_directory].ToString (); //Screenshot location
 				}
 			}
-
-
 		}
-		
+
+
+		public void LoadMame (ref XmlDocument mameDocument, string mamePath)
+		{
+			mameDocument.Load (mamePath + "/mameinfo.xml");
+		}
+
+
 		public int AddGame ()
 		{
 			return 1;
