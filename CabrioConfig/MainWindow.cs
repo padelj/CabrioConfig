@@ -134,6 +134,8 @@ public partial class MainWindow: Gtk.Window
 	XmlDocument configDocument = new XmlDocument ();
 	XmlDocument mameDocument = new XmlDocument();
 	string [] dirList;
+	string shortROMName;
+	string ROMDescription;
 
 	String filePath = Environment.GetEnvironmentVariable ("HOME") + "/.cabrio/config.xml";
 
@@ -317,6 +319,7 @@ public partial class MainWindow: Gtk.Window
 		Thread mameThread = new Thread (new ThreadStart (this.startMameLoad));
 		Thread statusThread = new Thread (new ThreadStart (this.statusMAMELoading));
 		Thread statusDoneThread = new Thread (new ThreadStart(this.statusMAMEDone));
+		string snapFileName = "";
 
 		statusThread.Start ();
 		Thread.Sleep (500);
@@ -335,7 +338,29 @@ public partial class MainWindow: Gtk.Window
 		statusDoneThread.Start ();
 
 		statusbar1.Pop (1);
-		statusbar1.Push (1,"Done");
+		statusbar1.Push (1,"Looking up games in ROMS path.");
+		Thread.Sleep (500);
+
+		Console.WriteLine ("Number of ROMS in directory: " + dirList.Length);
+
+		foreach (string romName in dirList)
+		{
+			Console.WriteLine ("ROM :" + romName);
+			shortROMName = System.IO.Path.GetFileNameWithoutExtension (romName);
+			Console.WriteLine ("ROM Short Name: " + shortROMName);
+			ROMDescription = mameDocument.SelectSingleNode ("/mame/game[@name='" + shortROMName + "']/description").InnerText;
+			Console.WriteLine ("Desc: " + ROMDescription);
+			if (Directory.Exists (txtSnapsPath.Text + "/" + shortROMName))
+			    {
+					string [] SnapDir = Directory.GetFiles (txtSnapsPath.Text + "/" + shortROMName);
+					if (SnapDir.Length > 0)
+					{
+						snapFileName = SnapDir[0];
+						Console.WriteLine ("Snap Name: " + snapFileName);
+					}
+				}
+
+		}
 
 	}
 
