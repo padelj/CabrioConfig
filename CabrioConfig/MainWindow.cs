@@ -1,12 +1,229 @@
 using System;
-using System.IO;
 using System.Data;
+using System.IO;
+using System.Threading;
+using System.Xml;
 using Gtk;
 using CabrioConfig;
-using System.Xml;
 
 public partial class MainWindow: Gtk.Window
 {	
+	/* Specific XML tags */
+	private const string tag_root						= "cabrio-config";
+	private const string tag_emulators					= "emulators";
+	private const string tag_emulator_executable		= 		"executable";
+	private const string tag_game_list					= "game-list";
+	private const string tag_games						=   "games";
+	private const string tag_game						=     "game";
+	private const string tag_game_rom_image				=       "rom-image";
+	private const string tag_game_categories			=       "categories";
+	private const string tag_game_images				=     "images";
+	private const string tag_game_images_image			=       "image";
+	private const string tag_game_video					=     "video";
+	private const string tag_iface						= "interface";
+	private const string tag_iface_full_screen			= 	"full-screen";
+	private const string tag_iface_screen				=   "screen";
+	private const string tag_iface_screen_hflip			=     "flip-horizontal";
+	private const string tag_iface_screen_vflip			=     "flip-vertical";
+	private const string tag_iface_controls				=   "controls";
+	private const string tag_iface_frame_rate			=   "frame-rate";
+	private const string tag_iface_gfx					=   "graphics";
+	private const string tag_iface_gfx_quality			=     "quality";
+	private const string tag_iface_gfx_max_width		=     "max-image-width";
+	private const string tag_iface_gfx_max_height		=     "max-image-height";
+	private const string tag_iface_theme				=     "theme";
+	private const string tag_iface_labels				=   "labels";
+	private const string tag_iface_labels_label			=     "label";
+	private const string tag_iface_prune_menus			=   "prune-menus";
+	private const string tag_iface_lookups				=   "lookups";
+	private const string tag_iface_lookups_category		=     "category-lookup";
+	private const string tag_iface_lookups_lookup		=       "lookup";
+	private const string tag_themes						=   "themes";
+	private const string tag_themes_theme				=     "theme";
+	private const string tag_theme_menu					=   "menu";
+	private const string tag_theme_menu_item_width		=     "item-width";
+	private const string tag_theme_menu_item_height		=     "item-height";
+	private const string tag_theme_menu_items_visible	=     "items-visible";
+	private const string tag_theme_menu_border			=     "border";
+	private const string tag_theme_submenu				=   "submenu";
+	private const string tag_theme_submenu_item_width	=     "item-width";
+	private const string tag_theme_submenu_item_height	=     "item-height";
+	private const string tag_theme_background			=   "background";
+	private const string tag_theme_font					=   "font";
+	private const string tag_theme_font_file			=     "font-file";
+	private const string tag_theme_sounds				=	"sounds";
+	private const string tag_theme_sounds_sound			=	  "sound";
+	private const string tag_theme_sounds_sound_file	=	  "sound-file";
+	private const string tag_theme_snap					=	"snap";
+	private const string tag_theme_snap_fix_ar			=	  "fix-aspect-ratio";
+	private const string tag_theme_snap_platform_icons	=	  "platform-icons";
+	private const string tag_theme_hints				=	"hints";
+	private const string tag_theme_hints_pulse			=     "pulse";
+	private const string tag_theme_hints_image_back		=     "back-image";
+	private const string tag_theme_hints_image_select	=     "select-image";
+	private const string tag_theme_hints_image_arrow	=     "arrow-image";
+	private const string tag_theme_game_sel				=   "game-selector";
+	private const string tag_theme_game_sel_selected	=     "selected";
+	private const string tag_theme_game_sel_tile_size	=     "tile-size";
+	private const string tag_theme_game_sel_tiles		=     "tiles";
+	private const string tag_theme_game_sel_tiles_tile	=       "tile";
+	private const string tag_locations					= "locations";
+	private const string tag_locations_location			=   "location";
+	
+	/* General (reused) XML tags */
+	private const string tag_name						= "name";
+	private const string tag_value						= "value";
+	private const string tag_id							= "id";
+	private const string tag_display_name				= "display-name";
+	private const string tag_platform					= "platform";
+	private const string tag_params						= "params";
+	private const string tag_param						= "param";
+	private const string tag_control					= "control";
+	private const string tag_event						= "event";
+	private const string tag_device						= "device";
+	private const string tag_type						= "type";
+	private const string tag_width						= "width";
+	private const string tag_height						= "height";
+	private const string tag_transparency				= "transparency";
+	private const string tag_zoom						= "zoom";
+	private const string tag_rotation					= "rotation";
+	private const string tag_image_file					= "image-file";
+	private const string tag_size						= "size";
+	private const string tag_x_size						= "x-size";
+	private const string tag_y_size						= "y-size";
+	private const string tag_font_scale					= "font-scale";
+	private const string tag_orientation				= "orientation";
+	private const string tag_offset1					= "primary-offset";
+	private const string tag_offset2					= "secondary-offset";
+	private const string tag_auto_hide					= "auto-hide";
+	private const string tag_angle_x					= "x-angle";
+	private const string tag_angle_y					= "y-angle";
+	private const string tag_angle_z					= "z-angle";
+	private const string tag_position_x					= "x-position";
+	private const string tag_position_y					= "y-position";
+	private const string tag_position_z					= "z-position";
+	private const string tag_order						= "order";
+	private const string tag_directory					= "directory";
+	private const string tag_color						= "color";
+	private const string tag_match						= "match";
+	private const string tag_category					= "category";
+	private const string tag_emulator					= "emulator";
+	private const string tag_default					= "default";
+	private const string tag_spacing					= "spacing";
+	
+	/* Common values */
+	private const string config_empty					= "";
+	private const string config_true					= "true";
+	private const string config_false					= "false";
+	private const string config_yes						= "yes";
+	private const string config_no						= "no";
+	private const string config_low						= "low";
+	private const string config_medium					= "medium";
+	private const string config_high					= "high";
+	private const string config_portrait				= "portrait";
+	private const string config_landscape				= "landscape";
+	private const string config_auto					= "auto";
+	
+	/* Labels */
+	private const string config_label_all				= "all";
+	private const string config_label_platform			= "platform";
+	private const string config_label_back				= "back";
+	private const string config_label_select			= "select";
+	private const string config_label_lists				= "lists";
+	
+	XmlDocument configDocument = new XmlDocument ();
+	XmlDocument mameDocument = new XmlDocument();
+	string [] dirList;
+
+	String filePath = Environment.GetEnvironmentVariable ("HOME") + "/.cabrio/config.xml";
+
+	
+	public int ReadConfig ()
+	{
+		configDocument.Load (filePath);
+		Console.WriteLine ("config XML Loaded");
+		return 1;
+	}
+
+	private int ReadMAME ()
+	{
+		
+		/* Dataset version
+			dsMAMEXML.ReadXml (MAMEPath);
+			
+			Console.WriteLine (dsMAMEXML.Tables.Count);
+			Console.WriteLine (dsMAMEXML.Tables["game"].Rows.Count);
+			Console.WriteLine (dsMAMEXML.Tables["game"].Rows[1].ItemArray); 
+			*/
+		
+		/* Start of XPath working sample.
+			XmlDocument myXMLDoc = new XmlDocument();
+			myXMLDoc.Load (MAMEPath);
+			
+			String gameDesc = myXMLDoc.SelectSingleNode ("/mame/game[@name='" + txtGameName + "']/description").InnerText;
+			Console.WriteLine (gameDesc);  
+			
+			end of sample */
+		
+		/* Sample directory
+			
+			string [] dirList = Directory.GetFiles ("/home/jim/.mame/roms/");
+			
+			foreach (string myList in dirList)
+			{
+				Console.WriteLine (Path.GetFileNameWithoutExtension (myList));
+			}
+			*/
+		
+		return 1;
+	}
+	
+	public int WriteConfig ()
+	{
+		/* write config test
+			int indexCount = 0;
+			foreach (DataRow paramLoop in dsConfig.Tables["game"].Rows)
+			{
+				Console.WriteLine (paramLoop["name"].ToString ());
+				Console.WriteLine (paramLoop["rom-image"].ToString ());
+			}
+
+			dsConfig.WriteXml ("/tmp/testfile.xml");
+			dsConfig.WriteXmlSchema ("/tmp/schema.xsd");
+			*/
+		
+		return 1;
+	}
+	
+	
+	public void LoadConfig ()
+	{
+		Console.WriteLine ("Loading...");
+		this.ReadConfig ();
+		txtMAMEPath.Text = "/home/jim/.mame";			//Temporary for debug
+		txtROMSPath.Text = "/home/jim/.mame/roms";	//Temporary for debug
+		
+		txtSnapsPath.Text = configDocument.SelectSingleNode ("/cabrio-config/locations/location/directory").InnerText;
+	}
+	
+	
+	public void LoadMame ()
+	{
+		Console.WriteLine ("Running");
+		Thread.Sleep (500);
+		mameDocument.Load (txtMAMEPath.Text + "/mameinfo.xml");
+	}
+	
+	public int AddGame ()
+	{
+		return 1;
+	}
+	
+	public int DelGame ()
+	{
+		return 1;
+	}
+
 	public MainWindow (): base (Gtk.WindowType.Toplevel)
 	{
 		Build ();
@@ -78,19 +295,10 @@ public partial class MainWindow: Gtk.Window
 
 	protected void OnOpenActionActivated (object sender, System.EventArgs e)
 	{
+		//statusbar1.Push (1,"Done");
 		statusbar1.Push (1,"Loading existing config file, please wait...");
-		string [] configArray = new string[3];
-		for (int x=0;x<configArray.Length;x++)
-		{
-			configArray[x] = "Unassigned";
-		}
-		config myConfig = new config ();
-		myConfig.LoadConfig (ref configArray);
-		txtMAMEPath.Text = configArray[0];
-		txtROMSPath.Text = configArray[1];
-		txtSnapsPath.Text = configArray[2];
+		this.LoadConfig ();
 		statusbar1.Pop (1);
-		myConfig = null;
 		statusbar1.Push (1,"Ready");
 	}
 
@@ -106,16 +314,52 @@ public partial class MainWindow: Gtk.Window
 	
 	protected void OnBtnScanClicked (object sender, EventArgs e)
 	{
-		statusbar1.Push (1,"Loading MAME file.  This will take some time.");
+		Thread mameThread = new Thread (new ThreadStart (this.startMameLoad));
+		Thread statusThread = new Thread (new ThreadStart (this.statusMAMELoading));
+		Thread statusDoneThread = new Thread (new ThreadStart(this.statusMAMEDone));
 
-		string [] dirList = Directory.GetFiles (txtROMSPath.Text);
+		statusThread.Start ();
+		Thread.Sleep (500);
+		mameThread.Start ();
+
+		while (mameThread.IsAlive)
+		{
+			Thread.Sleep (500);
+		}
+
+		dirList = Directory.GetFiles (txtROMSPath.Text);
 		Console.WriteLine (dirList.Length); //Directory count
 
-		config myConfig = new config ();
-		XmlDocument mameDocument = new XmlDocument();
-		myConfig.LoadMame (ref mameDocument, txtMAMEPath.Text);
+		this.ReadConfig ();
+
+		statusDoneThread.Start ();
 
 		statusbar1.Pop (1);
+		statusbar1.Push (1,"Done");
+
+	}
+
+	protected void startMameLoad()
+	{
+		this.LoadMame ();
+	}
+
+	protected void statusMAMELoading()
+	{
+		Gtk.Application.Invoke(delegate {
+			statusbar1.Push (1,"Loading MAME file.  This will take some time.");
+		});
+		Thread.Sleep (500);
+
+	}
+
+	protected void statusMAMEDone()
+	{
+		Gtk.Application.Invoke(delegate {
+			statusbar1.Push (1,"Done");
+		});
+		Thread.Sleep (500);
+		
 
 	}
 }
