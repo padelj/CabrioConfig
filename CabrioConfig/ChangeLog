@@ -1,5 +1,12 @@
 2013-08-02  James Padel  <james.padel@ucf.edu>
 
+	* MainWindow.cs: Added duplicate entry checking for file
+	creation.
+
+	* gui.stetic: 
+
+2013-08-02  James Padel  <james.padel@ucf.edu>
+
 	* MainWindow.cs: BASIC working model. Added code to generate
 	and save XML. No existing file checks and no GUI list yet.
 
