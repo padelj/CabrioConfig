@@ -138,12 +138,37 @@ public partial class MainWindow: Gtk.Window
 	string shortROMName;
 	string ROMDescription;
 	string statusText = "Ready";
+	int ChildIndexConfig;
+	int ChildIndexGameList;
+	int ChildIndexGames;
 	String filePath = Environment.GetEnvironmentVariable ("HOME") + "/.cabrio/config.xml";
-	
-	public int ReadConfig ()
+
+
+	private int ReadConfig ()
 	{
 		configDocument.Load (filePath);
 		Console.WriteLine ("config XML Loaded");
+		int x = 0;
+		foreach (XmlNode tempNode in configDocument.ChildNodes)
+		{
+			if (tempNode.Name == "cabrio-config") {ChildIndexConfig = x; Console.WriteLine ("cabrio-config index: " + x);}
+			x++;
+		}
+
+		x = 0;
+		foreach (XmlNode tempNode in configDocument.ChildNodes[ChildIndexConfig].ChildNodes)
+		{
+			if (tempNode.Name == "game-list") {ChildIndexGameList = x; Console.WriteLine ("game-list index: " + x);}
+			x++;
+		}
+
+		x = 0;
+		foreach (XmlNode tempNode in configDocument.ChildNodes[ChildIndexConfig].ChildNodes[ChildIndexGameList].ChildNodes)
+		{
+			if (tempNode.Name == "games") {ChildIndexGames = x; Console.WriteLine ("games index: " + x);}
+			x++;
+		}
+
 		return 1;
 	}
 
@@ -209,7 +234,6 @@ public partial class MainWindow: Gtk.Window
 	
 	public void LoadMame ()
 	{
-		Console.WriteLine ("Running");
 		Thread.Sleep (500);
 		mameDocument.Load (txtMAMEPath.Text + "/mameinfo.xml");
 	}
@@ -313,6 +337,7 @@ public partial class MainWindow: Gtk.Window
 		XmlDocumentFragment newXMLDocFrag;
 		//XmlNode searchXMLNode;
 
+		Console.WriteLine ("Loading MAME XML.  Please Wait.");
 		statusText = "Loading MAME XML.  Please Wait.";
 		statusThread.Start ();
 		Thread.Sleep (500);
@@ -323,10 +348,11 @@ public partial class MainWindow: Gtk.Window
 		}
 
 		dirList = Directory.GetFiles (txtROMSPath.Text);
-		Console.WriteLine (dirList.Length); //Directory count
+		Console.WriteLine ("Count of ROM files: " + dirList.Length); //Directory count
 
 		this.ReadConfig ();
 
+		Console.WriteLine ("Looking up MAME ROM matches.");
 		statusThread = null;
 		statusText = "Looking up MAME ROM matches.";
 		statusThread = new Thread (new ThreadStart (this.statusBarUpdateThread));
@@ -383,7 +409,8 @@ public partial class MainWindow: Gtk.Window
 			
 				newXMLDocFrag = configDocument.CreateDocumentFragment ();
 				newXMLDocFrag.InnerXml = stringXML;
-				configDocument.ChildNodes [1].ChildNodes [3].ChildNodes [1].AppendChild (newXMLDocFrag);
+				configDocument.ChildNodes [ChildIndexConfig].ChildNodes [ChildIndexGameList]
+				.ChildNodes [ChildIndexGames].AppendChild (newXMLDocFrag);
 			}
 
 		}
