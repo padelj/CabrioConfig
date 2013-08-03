@@ -130,12 +130,15 @@ public partial class MainWindow: Gtk.Window
 	private const string config_label_back				= "back";
 	private const string config_label_select			= "select";
 	private const string config_label_lists				= "lists";
+
+	private const string CrLf							= "\n";
 	
 	XmlDocument configDocument = new XmlDocument ();
 	XmlDocument mameDocument = new XmlDocument();
 	string [] dirList;
 	string shortROMName;
 	string ROMDescription;
+	string statusText = "Ready";
 
 	String filePath = Environment.GetEnvironmentVariable ("HOME") + "/.cabrio/config.xml";
 
@@ -298,10 +301,11 @@ public partial class MainWindow: Gtk.Window
 	protected void OnOpenActionActivated (object sender, System.EventArgs e)
 	{
 		//statusbar1.Push (1,"Done");
-		statusbar1.Push (1,"Loading existing config file, please wait...");
+		statusText = "Loading Cabrio Config";
+		this.statusBarUpdateThread ();
 		this.LoadConfig ();
-		statusbar1.Pop (1);
-		statusbar1.Push (1,"Ready");
+		statusText = "Ready";
+		this.statusBarUpdateThread ();
 	}
 
 	protected void OnOpenAction1Activated (object sender, System.EventArgs e)
@@ -317,10 +321,14 @@ public partial class MainWindow: Gtk.Window
 	protected void OnBtnScanClicked (object sender, EventArgs e)
 	{
 		Thread mameThread = new Thread (new ThreadStart (this.startMameLoad));
-		Thread statusThread = new Thread (new ThreadStart (this.statusMAMELoading));
+		Thread statusThread = new Thread (new ThreadStart (this.statusBarUpdateThread));
 		Thread statusDoneThread = new Thread (new ThreadStart(this.statusMAMEDone));
 		string snapFileName = "";
+		string stringXML = "";
+		XmlDocumentFragment newXMLDocFrag;
+		XmlNode searchXMLNode;
 
+		statusText = "Loading MAME XML.  Please Wait.";
 		statusThread.Start ();
 		Thread.Sleep (500);
 		mameThread.Start ();
@@ -335,11 +343,9 @@ public partial class MainWindow: Gtk.Window
 
 		this.ReadConfig ();
 
-		statusDoneThread.Start ();
-
-		statusbar1.Pop (1);
-		statusbar1.Push (1,"Looking up games in ROMS path.");
-		Thread.Sleep (500);
+		statusThread = null;
+		statusText = "Looking up MAME ROM matches.";
+		statusThread = new Thread (new ThreadStart (this.statusBarUpdateThread));
 
 		Console.WriteLine ("Number of ROMS in directory: " + dirList.Length);
 
@@ -349,7 +355,15 @@ public partial class MainWindow: Gtk.Window
 			shortROMName = System.IO.Path.GetFileNameWithoutExtension (romName);
 			Console.WriteLine ("ROM Short Name: " + shortROMName);
 			ROMDescription = mameDocument.SelectSingleNode ("/mame/game[@name='" + shortROMName + "']/description").InnerText;
+			if (ROMDescription.IndexOf ("&") > 0)
+			{
+				ROMDescription = ROMDescription.Substring (0,ROMDescription.IndexOf ("&") -1) +
+					ROMDescription.Substring (ROMDescription.IndexOf ("&") + 1);
+
+			}
+		
 			Console.WriteLine ("Desc: " + ROMDescription);
+			snapFileName = "";
 			if (Directory.Exists (txtSnapsPath.Text + "/" + shortROMName))
 			    {
 					string [] SnapDir = Directory.GetFiles (txtSnapsPath.Text + "/" + shortROMName);
@@ -359,9 +373,40 @@ public partial class MainWindow: Gtk.Window
 						Console.WriteLine ("Snap Name: " + snapFileName);
 					}
 				}
+			stringXML = "<game>" + CrLf + 
+				"<name>" + ROMDescription + "</name>" + CrLf + 
+				"<platform>Arcade</platform>" + CrLf + 
+        		"<rom-image>" + romName + "</rom-image>" + CrLf +
+					"<images>" + CrLf;
+
+			if (snapFileName.Length > 0)
+			{
+          		stringXML = stringXML +	"<image>" + CrLf +
+					"<type>screenshot</type>" + CrLf +
+					"<image-file>" + snapFileName + "</image-file>" + CrLf +
+					"</image>" + CrLf ;
+			}
+
+			stringXML = stringXML + "</images>" + CrLf +
+        		"<categories>" + CrLf +
+          		"<category>" + CrLf +
+            	"<name>Genre</name>" + CrLf +
+            	"<value>Maze</value>" + CrLf +
+          		"</category>" + CrLf +
+        		"</categories>" + CrLf +
+      			"</game>" + CrLf;
+			Console.WriteLine (stringXML);
+			newXMLDocFrag = configDocument.CreateDocumentFragment ();
+			newXMLDocFrag.InnerXml = stringXML;
+			//searchXMLNode = configDocument.SelectSingleNode ("/cabrio-config/game-list/games");
+			//mameDocument.InsertAfter (newXMLDocFrag, searchXMLNode);
+			configDocument.ChildNodes[1].ChildNodes[3].ChildNodes[1].AppendChild (newXMLDocFrag);
 
 		}
 
+
+
+		statusDoneThread.Start ();
 	}
 
 	protected void startMameLoad()
@@ -384,7 +429,19 @@ public partial class MainWindow: Gtk.Window
 			statusbar1.Push (1,"Done");
 		});
 		Thread.Sleep (500);
-		
-
 	}
+
+	protected void statusBarUpdateThread()
+	{
+		Gtk.Application.Invoke(delegate {
+			statusbar1.Push (1,statusText);
+		});
+		Thread.Sleep (500);
+	}
+	protected void OnSaveActionActivated (object sender, EventArgs e)
+	{
+		//configDocument.Save ("/tmp/testxml.xml");
+		configDocument.Save (filePath);
+	}
+
 }

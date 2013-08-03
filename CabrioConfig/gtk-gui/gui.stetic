@@ -6,7 +6,7 @@
   </configuration>
   <import>
     <widget-library name="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <widget-library name="../bin/Debug/CabrioConfig.exe" internal="true" />
+    <widget-library name="../bin/Release/CabrioConfig.exe" internal="true" />
   </import>
   <widget class="Gtk.Window" id="MainWindow" design-size="596 482">
     <action-group name="Default">
@@ -20,6 +20,7 @@
         <property name="Type">Action</property>
         <property name="Label" translatable="yes" />
         <property name="StockId">gtk-save</property>
+        <signal name="Activated" handler="OnSaveActionActivated" />
       </action>
       <action id="saveAsAction">
         <property name="Type">Action</property>
