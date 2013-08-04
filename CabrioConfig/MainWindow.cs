@@ -361,15 +361,16 @@ public partial class MainWindow: Gtk.Window
 		XmlNode tempNode;
 		foreach (string romName in dirList) {
 			Console.WriteLine ("ROM :" + romName);
-			//regROMName = System.IO.Path.GetFileName(romName);
 			tempNode = configDocument.SelectSingleNode ("/cabrio-config/game-list/games/game[rom-image='" + 
 			                                            romName + "']");
-			if (tempNode == null) 
+			if (tempNode == null) //Then create new entry
 			{
 				shortROMName = System.IO.Path.GetFileNameWithoutExtension (romName);
 				Console.WriteLine ("ROM Short Name: " + shortROMName);
-				ROMDescription = mameDocument.SelectSingleNode ("/mame/game[@name='" + shortROMName + "']/description").InnerText;
-				if (ROMDescription.IndexOf ("&") > 0) {
+				ROMDescription = mameDocument.SelectSingleNode ("/mame/game[@name='" + shortROMName + 
+				                                                "']/description").InnerText;
+				if (ROMDescription.IndexOf ("&") > 0) //Filtering out bad XML character.
+				{  
 					ROMDescription = ROMDescription.Substring (0, ROMDescription.IndexOf ("&") - 1) +
 						ROMDescription.Substring (ROMDescription.IndexOf ("&") + 1);
 
@@ -410,7 +411,7 @@ public partial class MainWindow: Gtk.Window
 				newXMLDocFrag = configDocument.CreateDocumentFragment ();
 				newXMLDocFrag.InnerXml = stringXML;
 				configDocument.ChildNodes [ChildIndexConfig].ChildNodes [ChildIndexGameList]
-				.ChildNodes [ChildIndexGames].AppendChild (newXMLDocFrag);
+									.ChildNodes [ChildIndexGames].AppendChild (newXMLDocFrag);
 			}
 
 		}
@@ -452,4 +453,8 @@ public partial class MainWindow: Gtk.Window
 		configDocument.Save (filePath);
 	}
 
+	protected void OnNewActionActivated (object sender, EventArgs e)
+	{
+
+	}
 }
