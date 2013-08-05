@@ -131,6 +131,8 @@ public partial class MainWindow: Gtk.Window
 	private const string config_label_select = "select";
 	private const string config_label_lists = "lists";
 	private const string CrLf = "\n";
+
+
 	XmlDocument configDocument = new XmlDocument ();
 	XmlDocument mameDocument = new XmlDocument ();
 	string[] dirList;
@@ -142,7 +144,8 @@ public partial class MainWindow: Gtk.Window
 	int ChildIndexGameList;
 	int ChildIndexGames;
 	String filePath = Environment.GetEnvironmentVariable ("HOME") + "/.cabrio/config.xml";
-
+	TreeViewColumn RomName = new TreeViewColumn ();
+	TreeViewColumn RomDesc = new TreeViewColumn ();
 
 	private int ReadConfig ()
 	{
@@ -455,6 +458,13 @@ public partial class MainWindow: Gtk.Window
 
 	protected void OnNewActionActivated (object sender, EventArgs e)
 	{
+		//RomName.Title ("ROM Name");
+		//RomDesc.Title ("Description");
+		Console.WriteLine ("Updating view...");
+		nvGamesList.InsertColumn (RomName,0);
+		nvGamesList.InsertColumn (RomDesc,1);
+		nvGamesList.EnableGridLines ();
+		nvGamesList.ShowNow ();
 
 	}
 }

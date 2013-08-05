@@ -410,6 +410,7 @@ public partial class MainWindow
 		this.DeleteEvent += new global::Gtk.DeleteEventHandler (this.OnDeleteEvent);
 		this.openAction.Activated += new global::System.EventHandler (this.OnOpenActionActivated);
 		this.saveAction.Activated += new global::System.EventHandler (this.OnSaveActionActivated);
+		this.newAction.Activated += new global::System.EventHandler (this.OnNewActionActivated);
 		this.openAction1.Activated += new global::System.EventHandler (this.OnOpenAction1Activated);
 		this.quitAction.Activated += new global::System.EventHandler (this.OnQuitActionActivated);
 		this.btnMAMEBrowse.Clicked += new global::System.EventHandler (this.OnBtnMAMEBrowseClicked);
