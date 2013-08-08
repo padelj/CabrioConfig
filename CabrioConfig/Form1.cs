@@ -225,7 +225,11 @@ namespace CabrioConfig
 
         private void btnMAMEBrowse_Click(object sender, EventArgs e)
         {
-
+            this.folderBrowserDialog1.Description = "Choose MAME folder";
+            if (this.folderBrowserDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                this.txtMAMEPath.Text = this.folderBrowserDialog1.SelectedPath;
+            }
         }
 
         private void btnROMSBrowse_Click(object sender, EventArgs e)

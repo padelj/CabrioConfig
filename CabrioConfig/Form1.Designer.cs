@@ -31,6 +31,9 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.TabControl1 = new System.Windows.Forms.TabControl();
             this.tabPaths = new System.Windows.Forms.TabPage();
+            this.btnSnapBrowse = new System.Windows.Forms.Button();
+            this.btnROMSBrowse = new System.Windows.Forms.Button();
+            this.btnMAMEBrowse = new System.Windows.Forms.Button();
             this.txtSnapsPath = new System.Windows.Forms.TextBox();
             this.txtROMSPath = new System.Windows.Forms.TextBox();
             this.txtMAMEPath = new System.Windows.Forms.TextBox();
@@ -61,9 +64,7 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
-            this.btnMAMEBrowse = new System.Windows.Forms.Button();
-            this.btnROMSBrowse = new System.Windows.Forms.Button();
-            this.btnSnapBrowse = new System.Windows.Forms.Button();
+            this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.TabControl1.SuspendLayout();
             this.tabPaths.SuspendLayout();
             this.tabGames.SuspendLayout();
@@ -101,6 +102,36 @@
             this.tabPaths.TabIndex = 0;
             this.tabPaths.Text = "Paths";
             this.tabPaths.UseVisualStyleBackColor = true;
+            // 
+            // btnSnapBrowse
+            // 
+            this.btnSnapBrowse.Location = new System.Drawing.Point(455, 107);
+            this.btnSnapBrowse.Name = "btnSnapBrowse";
+            this.btnSnapBrowse.Size = new System.Drawing.Size(75, 23);
+            this.btnSnapBrowse.TabIndex = 8;
+            this.btnSnapBrowse.Text = "...";
+            this.btnSnapBrowse.UseVisualStyleBackColor = true;
+            this.btnSnapBrowse.Click += new System.EventHandler(this.btnSnapBrowse_Click);
+            // 
+            // btnROMSBrowse
+            // 
+            this.btnROMSBrowse.Location = new System.Drawing.Point(455, 76);
+            this.btnROMSBrowse.Name = "btnROMSBrowse";
+            this.btnROMSBrowse.Size = new System.Drawing.Size(75, 23);
+            this.btnROMSBrowse.TabIndex = 7;
+            this.btnROMSBrowse.Text = "...";
+            this.btnROMSBrowse.UseVisualStyleBackColor = true;
+            this.btnROMSBrowse.Click += new System.EventHandler(this.btnROMSBrowse_Click);
+            // 
+            // btnMAMEBrowse
+            // 
+            this.btnMAMEBrowse.Location = new System.Drawing.Point(455, 39);
+            this.btnMAMEBrowse.Name = "btnMAMEBrowse";
+            this.btnMAMEBrowse.Size = new System.Drawing.Size(75, 23);
+            this.btnMAMEBrowse.TabIndex = 6;
+            this.btnMAMEBrowse.Text = "...";
+            this.btnMAMEBrowse.UseVisualStyleBackColor = true;
+            this.btnMAMEBrowse.Click += new System.EventHandler(this.btnMAMEBrowse_Click);
             // 
             // txtSnapsPath
             // 
@@ -366,36 +397,6 @@
             this.toolStripProgressBar1.Name = "toolStripProgressBar1";
             this.toolStripProgressBar1.Size = new System.Drawing.Size(100, 16);
             // 
-            // btnMAMEBrowse
-            // 
-            this.btnMAMEBrowse.Location = new System.Drawing.Point(455, 39);
-            this.btnMAMEBrowse.Name = "btnMAMEBrowse";
-            this.btnMAMEBrowse.Size = new System.Drawing.Size(75, 23);
-            this.btnMAMEBrowse.TabIndex = 6;
-            this.btnMAMEBrowse.Text = "...";
-            this.btnMAMEBrowse.UseVisualStyleBackColor = true;
-            this.btnMAMEBrowse.Click += new System.EventHandler(this.btnMAMEBrowse_Click);
-            // 
-            // btnROMSBrowse
-            // 
-            this.btnROMSBrowse.Location = new System.Drawing.Point(455, 76);
-            this.btnROMSBrowse.Name = "btnROMSBrowse";
-            this.btnROMSBrowse.Size = new System.Drawing.Size(75, 23);
-            this.btnROMSBrowse.TabIndex = 7;
-            this.btnROMSBrowse.Text = "...";
-            this.btnROMSBrowse.UseVisualStyleBackColor = true;
-            this.btnROMSBrowse.Click += new System.EventHandler(this.btnROMSBrowse_Click);
-            // 
-            // btnSnapBrowse
-            // 
-            this.btnSnapBrowse.Location = new System.Drawing.Point(455, 107);
-            this.btnSnapBrowse.Name = "btnSnapBrowse";
-            this.btnSnapBrowse.Size = new System.Drawing.Size(75, 23);
-            this.btnSnapBrowse.TabIndex = 8;
-            this.btnSnapBrowse.Text = "...";
-            this.btnSnapBrowse.UseVisualStyleBackColor = true;
-            this.btnSnapBrowse.Click += new System.EventHandler(this.btnSnapBrowse_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -461,6 +462,7 @@
         private System.Windows.Forms.Button btnSnapBrowse;
         private System.Windows.Forms.Button btnROMSBrowse;
         private System.Windows.Forms.Button btnMAMEBrowse;
+        private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
     }
 }
 
