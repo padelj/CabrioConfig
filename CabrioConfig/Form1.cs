@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml;
+using System.Threading;
+using System.IO;
 
 namespace CabrioConfig
 {
@@ -137,10 +139,17 @@ namespace CabrioConfig
 		private const string CrLf = "\n";
 
 		XmlDocument configDocument = new XmlDocument ();
-		String filePath = Environment.GetEnvironmentVariable ("HOME") + "/.cabrio/config.xml";
+		XmlDocument mameDocument = new XmlDocument ();
+
+		string filePath = Environment.GetEnvironmentVariable ("HOME") + "/.cabrio/config.xml";
 		int ChildIndexConfig;
 		int ChildIndexGameList;
 		int ChildIndexGames;
+
+		string statusText = "";
+		string [] dirList;
+		string shortROMName;
+		string ROMDescription;
 
 
         public Form1()
@@ -215,7 +224,8 @@ namespace CabrioConfig
 
         private void toolStripButtonOpen_Click(object sender, EventArgs e)
         {
-
+			this.LoadConfig ();
+			this.ReadConfig ();
         }
 
         private void toolStripButtonSave_Click(object sender, EventArgs e)
@@ -225,8 +235,14 @@ namespace CabrioConfig
 
         private void btnMAMEBrowse_Click(object sender, EventArgs e)
         {
+			if (this.txtMAMEPath.Text != "")
+			{
+				this.folderBrowserDialog1.SelectedPath = this.txtMAMEPath.Text;
+			}
+
             this.folderBrowserDialog1.Description = "Choose MAME folder";
-            if (this.folderBrowserDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+
+            if (this.folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
                 this.txtMAMEPath.Text = this.folderBrowserDialog1.SelectedPath;
             }
@@ -234,21 +250,125 @@ namespace CabrioConfig
 
         private void btnROMSBrowse_Click(object sender, EventArgs e)
         {
+			if (this.txtROMSPath.Text != "")
+			{
+				this.folderBrowserDialog1.SelectedPath = this.txtROMSPath.Text;
+			}
 
+			this.folderBrowserDialog1.Description = "Choose ROMS folder";
+
+			if (this.folderBrowserDialog1.ShowDialog () == DialogResult.OK)
+			{
+				this.txtROMSPath.Text = this.folderBrowserDialog1.SelectedPath;
+			}
         }
 
         private void btnSnapBrowse_Click(object sender, EventArgs e)
         {
+			if (this.txtSnapsPath.Text != "")
+			{
+				this.folderBrowserDialog1.SelectedPath = this.txtSnapsPath.Text;
+			}
+			
+			this.folderBrowserDialog1.Description = "Choose Snapshot folder";
+			
+			if (this.folderBrowserDialog1.ShowDialog () == DialogResult.OK)
+			{
+				this.txtSnapsPath.Text = this.folderBrowserDialog1.SelectedPath;
+			}
 
         }
 
         private void btnScan_Click(object sender, EventArgs e)
         {
-
-        }
+			dirList = Directory.GetFiles (txtROMSPath.Text);
+			Console.WriteLine ("Count of ROM files: " + dirList.Length); //Directory count
+		}
 
         private void btnLookup_Click(object sender, EventArgs e)
         {
+			Thread mameThread = new Thread (new ThreadStart (this.startMameLoad));
+			Thread statusThread = new Thread (new ThreadStart (this.statusBarUpdateThread));
+			Thread statusDoneThread = new Thread (new ThreadStart (this.statusMAMEDone));
+			string snapFileName = "";
+			string stringXML = "";
+			XmlDocumentFragment newXMLDocFrag;
+
+			Console.WriteLine ("Loading MAME XML.  Please Wait.");
+			statusText = "Loading MAME XML.  Please Wait.";
+			statusThread.Start ();
+			Thread.Sleep (500);
+			mameThread.Start ();
+			
+			while (mameThread.IsAlive) {
+				Thread.Sleep (500);
+			}
+
+			Console.WriteLine ("Looking up MAME ROM matches.");
+			statusThread = null;
+			statusText = "Looking up MAME ROM matches.";
+			statusThread = new Thread (new ThreadStart (this.statusBarUpdateThread));
+			
+			Console.WriteLine ("Number of ROMS in directory: " + dirList.Length);
+			XmlNode tempNode;
+			foreach (string romName in dirList) {
+				Console.WriteLine ("ROM :" + romName);
+				tempNode = configDocument.SelectSingleNode ("/cabrio-config/game-list/games/game[rom-image='" + 
+				                                            romName + "']");
+				if (tempNode == null) //Then create new entry
+				{
+					shortROMName = System.IO.Path.GetFileNameWithoutExtension (romName);
+					Console.WriteLine ("ROM Short Name: " + shortROMName);
+					ROMDescription = mameDocument.SelectSingleNode ("/mame/game[@name='" + shortROMName + 
+					                                                "']/description").InnerText;
+					if (ROMDescription.IndexOf ("&") > 0) //Filtering out bad XML character.
+					{  
+						ROMDescription = ROMDescription.Substring (0, ROMDescription.IndexOf ("&") - 1) +
+							ROMDescription.Substring (ROMDescription.IndexOf ("&") + 1);
+						
+					}
+					
+					Console.WriteLine ("Desc: " + ROMDescription);
+					snapFileName = "";
+					if (Directory.Exists (txtSnapsPath.Text + "/" + shortROMName)) {
+						string [] SnapDir = Directory.GetFiles (txtSnapsPath.Text + "/" + shortROMName);
+						if (SnapDir.Length > 0) {
+							snapFileName = SnapDir [0];
+							Console.WriteLine ("Snap Name: " + snapFileName);
+						}
+					}
+					stringXML = "<game>" + CrLf + 
+						"<name>" + ROMDescription + "</name>" + CrLf + 
+							"<platform>Arcade</platform>" + CrLf + 
+							"<rom-image>" + romName + "</rom-image>" + CrLf +
+							"<images>" + CrLf;
+					
+					if (snapFileName.Length > 0) {
+						stringXML = stringXML + "<image>" + CrLf +
+							"<type>screenshot</type>" + CrLf +
+								"<image-file>" + snapFileName + "</image-file>" + CrLf +
+								"</image>" + CrLf;
+					}
+					
+					stringXML = stringXML + "</images>" + CrLf +
+						"<categories>" + CrLf +
+							"<category>" + CrLf +
+							"<name>Genre</name>" + CrLf +
+							"<value>Maze</value>" + CrLf +
+							"</category>" + CrLf +
+							"</categories>" + CrLf +
+							"</game>" + CrLf;
+					Console.WriteLine (stringXML);
+					
+					newXMLDocFrag = configDocument.CreateDocumentFragment ();
+					newXMLDocFrag.InnerXml = stringXML;
+					configDocument.ChildNodes [ChildIndexConfig].ChildNodes [ChildIndexGameList]
+					.ChildNodes [ChildIndexGames].AppendChild (newXMLDocFrag);
+				}
+				
+			}
+			statusDoneThread.Start ();
+			
 
         }
 
@@ -266,6 +386,26 @@ namespace CabrioConfig
         {
 
         }
+
+		protected void startMameLoad ()
+		{
+			this.LoadMame ();
+		}
+
+		public void LoadMame ()
+		{
+			mameDocument.Load (txtMAMEPath.Text + "/mameinfo.xml");
+		}
+
+		protected void statusBarUpdateThread ()
+		{
+			this.statusStrip1.Text = statusText;
+		}
+
+		protected void statusMAMEDone ()
+		{
+			this.statusStrip1.Text = "Done";
+		}
 
     }
 }
