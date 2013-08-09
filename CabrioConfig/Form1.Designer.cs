@@ -42,8 +42,6 @@
             this.lblMAMEPath = new System.Windows.Forms.Label();
             this.tabGames = new System.Windows.Forms.TabPage();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.ROMName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Description = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnDelete = new System.Windows.Forms.Button();
             this.btnLookup = new System.Windows.Forms.Button();
             this.btnScan = new System.Windows.Forms.Button();
@@ -200,23 +198,10 @@
             // dataGridView1
             // 
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.ROMName,
-            this.Description});
             this.dataGridView1.Location = new System.Drawing.Point(7, 7);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.Size = new System.Drawing.Size(444, 143);
             this.dataGridView1.TabIndex = 5;
-            // 
-            // ROMName
-            // 
-            this.ROMName.HeaderText = "ROM Name";
-            this.ROMName.Name = "ROMName";
-            // 
-            // Description
-            // 
-            this.Description.HeaderText = "Description";
-            this.Description.Name = "Description";
             // 
             // btnDelete
             // 
@@ -389,7 +374,7 @@
             // toolStripStatusLabel1
             // 
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(118, 17);
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(39, 17);
             this.toolStripStatusLabel1.Text = "Ready";
             // 
             // toolStripProgressBar1
@@ -452,8 +437,6 @@
         private System.Windows.Forms.Label lblROMSPath;
         private System.Windows.Forms.Label lblMAMEPath;
         private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ROMName;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Description;
         private System.Windows.Forms.Button btnDelete;
         private System.Windows.Forms.Button btnLookup;
         private System.Windows.Forms.Button btnScan;
