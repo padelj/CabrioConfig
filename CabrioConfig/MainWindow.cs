@@ -4,7 +4,7 @@ using System.IO;
 using System.Threading;
 using System.Xml;
 using Gtk;
-using CabrioConfig;
+//using CabrioConfig;
 
 public partial class MainWindow: Gtk.Window
 {	
