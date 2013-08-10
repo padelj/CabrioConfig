@@ -467,8 +467,6 @@ namespace CabrioConfig
                 myTable.Columns.Add(ROM);
                 myTable.Columns.Add(Desc);
 				gameList.Tables.Add (myTable);
-				Console.WriteLine (gameList.Tables.Count);
-				Console.WriteLine (gameList.Tables[0].Columns[1].ColumnName);
             }
 
             XmlNodeList xmlGameList = configDocument.SelectNodes("/cabrio-config/game-list/games/game");
@@ -479,29 +477,15 @@ namespace CabrioConfig
             {
 				foreach (XmlNode tempNode in xmlGameList)
 				{
-					//Console.WriteLine ("Start iteration");
 					DataRow tempRow = gameList.Tables["GameList"].NewRow ();
-					//Console.WriteLine (tempNode.ChildNodes.Count);
-					//Console.WriteLine (tempNode.Name);
-					//Console.WriteLine (tempNode.ChildNodes[0].InnerText);
-					//Console.WriteLine (tempNode.ChildNodes[2].InnerText);
 
-					foreach (XmlNode tempSubNode in tempNode.ChildNodes)
-					{
-						if (tempSubNode.Name == "rom-image")
-						{
-							Console.WriteLine ("Adding column: " + tempSubNode.InnerText);
-							tempRow["ROM Name"] = tempSubNode.InnerText;
-						}
-						if (tempSubNode.Name == "name")
-						{
-							Console.WriteLine ("Adding column: " + tempSubNode.InnerText);
-							tempRow["Description"] = tempSubNode.InnerText;
-						}
-					}
+					tempRow["ROM Name"] = tempNode.SelectSingleNode ("rom-image").InnerText;
+					tempRow["Description"] = tempNode.SelectSingleNode ("name").InnerText;
+
 					gameList.Tables["GameList"].Rows.Add (tempRow);
 				}
             }
+
 			this.dataGridView1.DataSource = gameList.Tables["GameList"];
 			Console.WriteLine ("Datatable count: " + this.gameList.Tables["GameList"].Rows.Count);
 			this.dataGridView1.Columns[0].Width = Convert.ToInt16 (this.dataGridView1.Width *.55)-22;
