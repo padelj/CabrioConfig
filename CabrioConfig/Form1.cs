@@ -140,6 +140,9 @@ namespace CabrioConfig
         private const string LinCrLf = "\n";
         private const string WinCrLf = "\r\n";
         private string CrLf;
+        private const string LinDirSeparator = "/";
+        private const string WinDirSeparator = "\\";
+        private string DirSeparator;
 
         XmlDocument configDocument = new XmlDocument();
         XmlDocument mameDocument = new XmlDocument();
@@ -153,7 +156,7 @@ namespace CabrioConfig
             }
         }
 
-        string filePath = Environment.GetEnvironmentVariable("HOME") + "/.cabrio/config.xml";
+        string filePath;
         int ChildIndexConfig;
         int ChildIndexGameList;
         int ChildIndexGames;
@@ -172,8 +175,18 @@ namespace CabrioConfig
 
         private int ReadConfig()
         {
-			Console.WriteLine ("Cabrio filename: " + filePath);
-			if (File.Exists(filePath))
+            if (filePath == null)
+            {
+                if (IsLinux)
+                {
+                    filePath = Environment.GetEnvironmentVariable("HOME") + "/.cabrio/config.xml";
+                }
+                else
+                {
+                    filePath = Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%") + "\\.cabrio\\config.xml";
+                }
+            }
+            if (File.Exists(filePath))
             {
                 configDocument.Load(filePath);
                 Console.WriteLine("config XML Loaded");
@@ -201,7 +214,7 @@ namespace CabrioConfig
             else
             {
                 Console.WriteLine("Cabrio config file does not exist.");
-                this.statusStrip1.Text = "Cabrio config file does not exist.";
+                this.toolStripStatusLabel1.Text = "Cabrio config file does not exist.";
             }
 
             return 1;
@@ -209,6 +222,16 @@ namespace CabrioConfig
 
         public void LoadConfig()
         {
+            if (IsLinux)
+            {
+                filePath = Environment.GetEnvironmentVariable("HOME") + "/.cabrio/config.xml";
+            }
+            else
+            {
+                filePath = Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%") + "\\.cabrio\\config.xml";
+            }
+            Console.WriteLine("Cabrio filename: " + filePath);
+
             if (File.Exists(filePath))
             {
                 Console.WriteLine("Loading...");
@@ -221,7 +244,7 @@ namespace CabrioConfig
             else
             {
                 Console.WriteLine("Cabrio config file does not exist.");
-                this.statusStrip1.Text = "Cabrio config file does not exist.";
+                this.toolStripStatusLabel1.Text = "Cabrio config file does not exist.";
             }
 
         }
@@ -239,7 +262,7 @@ namespace CabrioConfig
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            configDocument.Save(filePath);
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -259,7 +282,7 @@ namespace CabrioConfig
 
         private void toolStripButtonSave_Click(object sender, EventArgs e)
         {
-
+            configDocument.Save(filePath);
         }
 
         private void btnMAMEBrowse_Click(object sender, EventArgs e)
@@ -310,48 +333,180 @@ namespace CabrioConfig
 
         private void btnScan_Click(object sender, EventArgs e)
         {
-            dirList = Directory.GetFiles(txtROMSPath.Text);
-            Console.WriteLine("Count of ROM files in directory: " + dirList.Length); //Directory count
-            this.populateListFromXML();
+            if (Directory.Exists(txtROMSPath.Text))
+            {
+                dirList = Directory.GetFiles(txtROMSPath.Text);
+                Console.WriteLine("Count of ROM files in directory: " + dirList.Length); //Directory count
+                this.populateListFromXML();
+            }
+            else
+            {
+                this.toolStripStatusLabel1.Text = "Directory does not exist. Please check.";
+            }
         }
 
         private void btnLookup_Click(object sender, EventArgs e)
         {
-            Thread mameThread = new Thread(new ThreadStart(this.startMameLoad));
-            Thread statusThread = new Thread(new ThreadStart(this.statusBarUpdateThread));
-            Thread statusDoneThread = new Thread(new ThreadStart(this.statusMAMEDone));
+            this.MAMEThreader();
+        }
+
+        private void btnDelete_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnUp_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnDown_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void startMameLoad()
+        {
+            this.LoadMame();
+        }
+
+        protected void LoadMame()
+        {
+            if (IsLinux)
+            {
+                if (File.Exists(txtMAMEPath.Text + "/mameinfo.xml"))
+                {
+                    mameDocument.Load(txtMAMEPath.Text + "/mameinfo.xml");
+                }
+                else
+                {
+                    this.toolStripStatusLabel1.Text = "File does not exist.  Please check.";
+                }
+            }
+            else
+            {
+                if (File.Exists(txtMAMEPath.Text + "\\mameinfo.xml"))
+                {
+                    mameDocument.Load(txtMAMEPath.Text + "\\mameinfo.xml");
+                }
+                else
+                {
+                    this.toolStripStatusLabel1.Text = "File does not exist.  Please check.";
+                }
+            }
+        }
+
+        protected void statusBarUpdateThread()
+        {
+            //Application.Invoke (delegate {
+                this.toolStripStatusLabel1.Text = statusText;
+            //});
+        }
+
+        protected void statusMAMEDone()
+        {
+            this.toolStripStatusLabel1.Text = "Done";
+        }
+
+        protected void populateListFromXML()
+        {
+            if (gameList == null)
+            {
+                Console.WriteLine("Creating dataset");
+                gameList = new DataSet();
+            }
+
+            if (gameList.Tables.Count == 0)
+            {
+                Console.WriteLine("Creating table");
+                DataTable myTable = new DataTable("GameList");
+                DataColumn ROM = new DataColumn("ROM Name", typeof(string));
+                ROM.Caption = "ROM";
+                DataColumn Desc = new DataColumn("Description", typeof(string));
+                Desc.Caption = "Description";
+                myTable.Columns.Add(ROM);
+                myTable.Columns.Add(Desc);
+                gameList.Tables.Add(myTable);
+            }
+
+            XmlNodeList xmlGameList = configDocument.SelectNodes("/cabrio-config/game-list/games/game");
+            Console.WriteLine(configDocument.ChildNodes.Count);
+            if (configDocument.ChildNodes.Count == 0)
+            {
+                this.ReadConfig();
+            }
+            Console.WriteLine("Count of games in XML: " + configDocument.ChildNodes[1].ChildNodes[3].ChildNodes[1].ChildNodes.Count);
+            Console.WriteLine("Count from XMLNode: " + xmlGameList.Count);
+            if (xmlGameList.Count > 0)
+            {
+                foreach (XmlNode tempNode in xmlGameList)
+                {
+                    DataRow tempRow = gameList.Tables["GameList"].NewRow();
+
+                    tempRow["ROM Name"] = tempNode.SelectSingleNode("rom-image").InnerText;
+                    tempRow["Description"] = tempNode.SelectSingleNode("name").InnerText;
+
+                    gameList.Tables["GameList"].Rows.Add(tempRow);
+                }
+            }
+
+            this.dataGridView1.DataSource = gameList.Tables["GameList"];
+            Console.WriteLine("Datatable count: " + this.gameList.Tables["GameList"].Rows.Count);
+            this.dataGridView1.Columns[0].Width = Convert.ToInt16(this.dataGridView1.Width * .55) - 22;
+            this.dataGridView1.Columns[1].Width = Convert.ToInt16(this.dataGridView1.Width * .45) - 22;
+            this.dataGridView1.Update();
+
+        }
+
+        protected void MAMEThreader()
+        {
+            //int statPercentage = 0;
             string snapFileName = "";
             string stringXML = "";
             XmlDocumentFragment newXMLDocFrag;
             if (IsLinux)
             {
                 CrLf = LinCrLf;
+                DirSeparator = LinDirSeparator;
             }
             else
             {
                 CrLf = WinCrLf;
+                DirSeparator = WinDirSeparator;
             }
+
+            Thread mameThread = new Thread(new ThreadStart(this.startMameLoad));
+            //Thread statusThread = new Thread(new ThreadStart(this.statusBarUpdateThread));
+            //Thread statusDoneThread = new Thread(new ThreadStart(this.statusMAMEDone));
 
             Console.WriteLine("Loading MAME XML.  Please Wait.");
             statusText = "Loading MAME XML.  Please Wait.";
-            statusThread.Start();
-            Thread.Sleep(500);
+            //statusThread.Start();
+            this.statusBarUpdateThread();
+            //Thread.Sleep(500);
             mameThread.Start();
 
             while (mameThread.IsAlive)
             {
-                Thread.Sleep(500);
+                //Thread.Sleep(500);
+                Application.DoEvents();
             }
 
             Console.WriteLine("Looking up MAME ROM matches.");
-            statusThread = null;
+            //statusThread = null;
             statusText = "Looking up MAME ROM matches.";
-            statusThread = new Thread(new ThreadStart(this.statusBarUpdateThread));
+            //statusThread = new Thread(new ThreadStart(this.statusBarUpdateThread));
+            this.statusBarUpdateThread();
 
             Console.WriteLine("Number of ROMS in directory: " + dirList.Length);
             XmlNode tempNode;
+
+            int statusCount = 0;
             foreach (string romName in dirList)
             {
+                statusCount++;
+                this.toolStripProgressBar1.Value = Convert.ToInt16(statusCount / dirList.Length);
+                Application.DoEvents();
                 Console.WriteLine("ROM :" + romName);
                 tempNode = configDocument.SelectSingleNode("/cabrio-config/game-list/games/game[rom-image='" +
                                                             romName + "']");
@@ -370,9 +525,9 @@ namespace CabrioConfig
 
                     Console.WriteLine("Desc: " + ROMDescription);
                     snapFileName = "";
-                    if (Directory.Exists(txtSnapsPath.Text + "/" + shortROMName))
+                    if (Directory.Exists(txtSnapsPath.Text + DirSeparator + shortROMName))
                     {
-                        string[] SnapDir = Directory.GetFiles(txtSnapsPath.Text + "/" + shortROMName);
+                        string[] SnapDir = Directory.GetFiles(txtSnapsPath.Text + DirSeparator + shortROMName);
                         if (SnapDir.Length > 0)
                         {
                             snapFileName = SnapDir[0];
@@ -408,90 +563,11 @@ namespace CabrioConfig
                     configDocument.ChildNodes[ChildIndexConfig].ChildNodes[ChildIndexGameList]
                     .ChildNodes[ChildIndexGames].AppendChild(newXMLDocFrag);
                 }
-
             }
-            statusDoneThread.Start();
+            //statusDoneThread.Start();
+            statusText = "Done";
+            this.statusBarUpdateThread();
+            this.toolStripProgressBar1.Value = 0;
         }
-
-        private void btnDelete_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void btnUp_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void btnDown_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        protected void startMameLoad()
-        {
-            this.LoadMame();
-        }
-
-        protected void LoadMame()
-        {
-            mameDocument.Load(txtMAMEPath.Text + "/mameinfo.xml");
-        }
-
-        protected void statusBarUpdateThread()
-        {
-            this.statusStrip1.Text = statusText;
-        }
-
-        protected void statusMAMEDone()
-        {
-            this.statusStrip1.Text = "Done";
-        }
-
-        protected void populateListFromXML()
-        {
-            if (gameList == null)
-            {
-				Console.WriteLine ("Creating dataset");
-                gameList = new DataSet();
-            }
-
-            if (gameList.Tables.Count == 0)
-            {
-				Console.WriteLine ("Creating table");
-                DataTable myTable = new DataTable("GameList");
-                DataColumn ROM = new DataColumn("ROM Name", typeof(string));
-                ROM.Caption = "ROM";
-                DataColumn Desc = new DataColumn("Description", typeof(string));
-                Desc.Caption = "Description";
-                myTable.Columns.Add(ROM);
-                myTable.Columns.Add(Desc);
-				gameList.Tables.Add (myTable);
-            }
-
-            XmlNodeList xmlGameList = configDocument.SelectNodes("/cabrio-config/game-list/games/game");
-
-            Console.WriteLine("Count of games in XML: " + configDocument.ChildNodes[1].ChildNodes[3].ChildNodes[1].ChildNodes.Count);
-			Console.WriteLine ("Count from XMLNode: " + xmlGameList.Count); 
-            if (xmlGameList.Count > 0)
-            {
-				foreach (XmlNode tempNode in xmlGameList)
-				{
-					DataRow tempRow = gameList.Tables["GameList"].NewRow ();
-
-					tempRow["ROM Name"] = tempNode.SelectSingleNode ("rom-image").InnerText;
-					tempRow["Description"] = tempNode.SelectSingleNode ("name").InnerText;
-
-					gameList.Tables["GameList"].Rows.Add (tempRow);
-				}
-            }
-
-			this.dataGridView1.DataSource = gameList.Tables["GameList"];
-			Console.WriteLine ("Datatable count: " + this.gameList.Tables["GameList"].Rows.Count);
-			this.dataGridView1.Columns[0].Width = Convert.ToInt16 (this.dataGridView1.Width *.55)-22;
-			this.dataGridView1.Columns[1].Width = Convert.ToInt16 (this.dataGridView1.Width *.45)-22;
-			this.dataGridView1.Update ();
-
-		}
     }
 }
