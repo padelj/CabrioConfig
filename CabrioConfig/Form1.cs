@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -12,7 +12,7 @@ using System.IO;
 
 namespace CabrioConfig
 {
-    public partial class Form1 : Form
+    public partial class frmMain : Form
     {
         /* Specific XML tags */
         private const string tag_root = "cabrio-config";
@@ -168,7 +168,7 @@ namespace CabrioConfig
 
         DataSet gameList = new DataSet();
 
-        public Form1()
+        public frmMain()
         {
             InitializeComponent();
         }
@@ -249,12 +249,6 @@ namespace CabrioConfig
 
         }
 
-
-        private void newToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.LoadConfig();
@@ -268,11 +262,6 @@ namespace CabrioConfig
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
 			Application.Exit ();
-        }
-
-        private void toolStripButtonNew_Click(object sender, EventArgs e)
-        {
-
         }
 
         private void toolStripButtonOpen_Click(object sender, EventArgs e)
@@ -333,16 +322,8 @@ namespace CabrioConfig
 
         private void btnScan_Click(object sender, EventArgs e)
         {
-            if (Directory.Exists(txtROMSPath.Text))
-            {
-                dirList = Directory.GetFiles(txtROMSPath.Text);
-                Console.WriteLine("Count of ROM files in directory: " + dirList.Length); //Directory count
-                this.populateListFromXML();
-            }
-            else
-            {
-                this.toolStripStatusLabel1.Text = "Directory does not exist. Please check.";
-            }
+			this.scanDirectory ();
+			this.populateListFromDirectory ();
         }
 
         private void btnLookup_Click(object sender, EventArgs e)
@@ -352,7 +333,11 @@ namespace CabrioConfig
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
+            DataGridViewRow DeleteRow = dataGridView1.CurrentRow;
 
+            string ROMName = DeleteRow.Cells["ROM Name"].Value.ToString();
+            Console.WriteLine("Deleting row: " + ROMName);
+            this.DeleteLine(ROMName);
         }
 		
         protected void startMameLoad()
@@ -448,6 +433,10 @@ namespace CabrioConfig
 
         protected void MAMEThreader()
         {
+			if (configDocument.ChildNodes.Count == 0)
+			{
+				ReadConfig ();
+			}
             string snapFileName = "";
             string stringXML = "";
             XmlDocumentFragment newXMLDocFrag;
@@ -478,18 +467,24 @@ namespace CabrioConfig
             statusText = "Looking up MAME ROM matches.";
             this.statusBarUpdateThread();
 
-            Console.WriteLine("Number of ROMS in directory: " + dirList.Length);
+            Console.WriteLine("Number of ROMS in list: " + gameList.Tables["GameList"].Rows.Count);
             XmlNode tempNode;
 
             int statusCount = 0;
-            foreach (string romName in dirList)
+			string romName;
+			DataRow[] tempListItem;
+            foreach ( DataRow listItem in gameList.Tables["GameList"].Rows)
             {
+				romName = listItem["ROM Name"].ToString();
+				tempListItem = gameList.Tables["GameList"].Select ("[ROM Name] = '" + romName + "'");
+				Console.WriteLine (tempListItem[0][0].ToString ());
                 statusCount++;
                 this.toolStripProgressBar1.Value = Convert.ToInt16(statusCount / dirList.Length);
                 Application.DoEvents();
                 Console.WriteLine("ROM :" + romName);
-                tempNode = configDocument.SelectSingleNode("/cabrio-config/game-list/games/game[rom-image='" +
-                                                            romName + "']");
+                tempNode = configDocument.SelectSingleNode("/cabrio-config/game-list/games/game[rom-image=\"" +
+                                                            romName + "\"]");
+                //Console.WriteLine(tempNode.ToString());
                 if (tempNode == null) //Then create new entry
                 {
                     shortROMName = System.IO.Path.GetFileNameWithoutExtension(romName);
@@ -500,7 +495,6 @@ namespace CabrioConfig
                     {
                         ROMDescription = ROMDescription.Substring(0, ROMDescription.IndexOf("&") - 1) +
                             ROMDescription.Substring(ROMDescription.IndexOf("&") + 1);
-
                     }
 
                     Console.WriteLine("Desc: " + ROMDescription);
@@ -543,10 +537,102 @@ namespace CabrioConfig
                     configDocument.ChildNodes[ChildIndexConfig].ChildNodes[ChildIndexGameList]
                     .ChildNodes[ChildIndexGames].AppendChild(newXMLDocFrag);
                 }
-            }
-            statusText = "Done";
+				else
+				{
+					shortROMName = System.IO.Path.GetFileNameWithoutExtension(romName);
+					Console.WriteLine("ROM Short Name: " + shortROMName);
+					ROMDescription = mameDocument.SelectSingleNode("/mame/game[@name='" + shortROMName +
+					                                               "']/description").InnerText;
+					if (ROMDescription.IndexOf("&") > 0) //Filtering out bad XML character.
+					{
+						ROMDescription = ROMDescription.Substring(0, ROMDescription.IndexOf("&") - 1) +
+							ROMDescription.Substring(ROMDescription.IndexOf("&") + 1);
+					}
+					
+					Console.WriteLine("Desc: " + ROMDescription);
+
+				}
+				tempListItem[0]["Description"] = ROMDescription;
+				gameList.Tables["GameList"].AcceptChanges ();
+			}
+
+			this.dataGridView1.Update ();
+			statusText = "Done";
             this.statusBarUpdateThread();
             this.toolStripProgressBar1.Value = 0;
+        }
+
+		protected void scanDirectory ()
+		{
+			if (Directory.Exists(txtROMSPath.Text))
+			{
+				dirList = Directory.GetFiles(txtROMSPath.Text);
+				Console.WriteLine("Count of ROM files in directory: " + dirList.Length); //Directory count
+			}
+			else
+			{
+				this.toolStripStatusLabel1.Text = "Directory does not exist. Please check.";
+			}
+		}
+
+		protected void populateListFromDirectory ()
+		{
+			if (gameList == null)
+			{
+				Console.WriteLine("Creating dataset");
+				gameList = new DataSet();
+			}
+			
+			if (gameList.Tables.Count == 0)
+			{
+				Console.WriteLine("Creating table");
+				DataTable myTable = new DataTable("GameList");
+				DataColumn ROM = new DataColumn("ROM Name", typeof(string));
+				ROM.Caption = "ROM";
+				DataColumn Desc = new DataColumn("Description", typeof(string));
+				Desc.Caption = "Description";
+				myTable.Columns.Add(ROM);
+				myTable.Columns.Add(Desc);
+				gameList.Tables.Add(myTable);
+			}
+			
+			if (dirList.Length > 0)
+			{
+				foreach (string romName in dirList)
+				{
+					DataRow tempRow = gameList.Tables["GameList"].NewRow();
+					
+					tempRow["ROM Name"] = romName;
+					tempRow["Description"] = "";
+					
+					gameList.Tables["GameList"].Rows.Add(tempRow);
+				}
+			}
+			
+			this.dataGridView1.DataSource = gameList.Tables["GameList"];
+			Console.WriteLine("Datatable count: " + this.gameList.Tables["GameList"].Rows.Count);
+			this.dataGridView1.Columns[0].Width = Convert.ToInt16(this.dataGridView1.Width * .55) - 22;
+			this.dataGridView1.Columns[1].Width = Convert.ToInt16(this.dataGridView1.Width * .45) - 22;
+			this.dataGridView1.Update();
+
+		}
+        
+        protected void DeleteLine (string ROMName)
+        {
+            if (configDocument.ChildNodes[ChildIndexConfig].ChildNodes[ChildIndexGameList].ChildNodes[ChildIndexGames].ChildNodes.Count > 0)
+            {
+                XmlNode DeleteNode = configDocument.SelectSingleNode("/cabrio-config/game-list/games/game[rom-image=\"" +
+                                                            ROMName + "\"]");
+                Console.WriteLine(DeleteNode.Name);
+                if (DeleteNode != null)
+                {
+                    DeleteNode.ParentNode.RemoveChild(DeleteNode);
+                }
+            }
+
+            gameList.Tables["GameList"].Rows[dataGridView1.Rows.IndexOf(dataGridView1.CurrentRow)].Delete();
+            gameList.AcceptChanges();
+            dataGridView1.Update();
         }
     }
 }
