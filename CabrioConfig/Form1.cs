@@ -267,7 +267,7 @@ namespace CabrioConfig
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+			Application.Exit ();
         }
 
         private void toolStripButtonNew_Click(object sender, EventArgs e)
@@ -354,17 +354,7 @@ namespace CabrioConfig
         {
 
         }
-
-        private void btnUp_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void btnDown_Click(object sender, EventArgs e)
-        {
-
-        }
-
+		
         protected void startMameLoad()
         {
             this.LoadMame();
@@ -398,9 +388,7 @@ namespace CabrioConfig
 
         protected void statusBarUpdateThread()
         {
-            //Application.Invoke (delegate {
                 this.toolStripStatusLabel1.Text = statusText;
-            //});
         }
 
         protected void statusMAMEDone()
@@ -460,7 +448,6 @@ namespace CabrioConfig
 
         protected void MAMEThreader()
         {
-            //int statPercentage = 0;
             string snapFileName = "";
             string stringXML = "";
             XmlDocumentFragment newXMLDocFrag;
@@ -476,26 +463,19 @@ namespace CabrioConfig
             }
 
             Thread mameThread = new Thread(new ThreadStart(this.startMameLoad));
-            //Thread statusThread = new Thread(new ThreadStart(this.statusBarUpdateThread));
-            //Thread statusDoneThread = new Thread(new ThreadStart(this.statusMAMEDone));
 
             Console.WriteLine("Loading MAME XML.  Please Wait.");
             statusText = "Loading MAME XML.  Please Wait.";
-            //statusThread.Start();
             this.statusBarUpdateThread();
-            //Thread.Sleep(500);
             mameThread.Start();
 
             while (mameThread.IsAlive)
             {
-                //Thread.Sleep(500);
                 Application.DoEvents();
             }
 
             Console.WriteLine("Looking up MAME ROM matches.");
-            //statusThread = null;
             statusText = "Looking up MAME ROM matches.";
-            //statusThread = new Thread(new ThreadStart(this.statusBarUpdateThread));
             this.statusBarUpdateThread();
 
             Console.WriteLine("Number of ROMS in directory: " + dirList.Length);
@@ -564,7 +544,6 @@ namespace CabrioConfig
                     .ChildNodes[ChildIndexGames].AppendChild(newXMLDocFrag);
                 }
             }
-            //statusDoneThread.Start();
             statusText = "Done";
             this.statusBarUpdateThread();
             this.toolStripProgressBar1.Value = 0;
