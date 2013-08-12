@@ -453,6 +453,7 @@ namespace CabrioConfig
 
 			Thread mameThread = new Thread (new ThreadStart (this.startMameLoad));
 
+			this.toolStripProgressBar1.Style = ProgressBarStyle.Marquee;
 			Console.WriteLine ("Loading MAME XML.  Please Wait.");
 			statusText = "Loading MAME XML.  Please Wait.";
 			this.statusBarUpdateThread ();
@@ -470,6 +471,8 @@ namespace CabrioConfig
 			XmlNode tempNode;
 
 			int statusCount = 0;
+			this.toolStripProgressBar1.Style = ProgressBarStyle.Blocks;
+			this.toolStripProgressBar1.Maximum = 100;
 			string romName;
 			DataRow[] tempListItem;
 			foreach (DataRow listItem in gameList.Tables["GameList"].Rows) {
@@ -477,7 +480,7 @@ namespace CabrioConfig
 				tempListItem = gameList.Tables ["GameList"].Select ("[ROM Name] = '" + romName + "'");
 				Console.WriteLine (tempListItem [0] [0].ToString ());
 				statusCount++;
-				this.toolStripProgressBar1.Value = Convert.ToInt16 (statusCount / dirList.Length);
+				this.toolStripProgressBar1.Value = Convert.ToInt16( 100 * (Convert.ToDouble (statusCount) / Convert.ToDouble (gameList.Tables["GameList"].Rows.Count)));
 				Application.DoEvents ();
 				Console.WriteLine ("ROM :" + romName);
 				tempNode = configDocument.SelectSingleNode ("/" + tag_root + "/" + 
@@ -614,7 +617,7 @@ namespace CabrioConfig
 				XmlNode DeleteNode = configDocument.SelectSingleNode ("/" + tag_root + "/"
 				                                                      + tag_game_list + "/" + tag_games
 				                                                       + "/"  + tag_game + "[" + tag_game_rom_image
-				                                                       + "=\"" + ROMName + "\"]");
+				                                                       + "='" + ROMName + "']");
 				Console.WriteLine (DeleteNode.Name);
 				if (DeleteNode != null) {
 					DeleteNode.ParentNode.RemoveChild (DeleteNode);
