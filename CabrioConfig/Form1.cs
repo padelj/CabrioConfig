@@ -139,6 +139,7 @@ namespace CabrioConfig
 		private const string LinDirSeparator = "/";
 		private const string WinDirSeparator = "\\";
 		private string DirSeparator;
+
 		XmlDocument appConfigDocument = new XmlDocument ();
 		XmlDocument configDocument = new XmlDocument ();
 		XmlDocument mameDocument = new XmlDocument ();
@@ -167,23 +168,6 @@ namespace CabrioConfig
 
 		protected void ReadConfig ()
 		{
-			string appConfig;
-
-			if (IsLinux) {
-				appConfig = Directory.GetCurrentDirectory() + "/appconfig.xml";
-			} else {
-				appConfig = Directory.GetCurrentDirectory() + "\\appconfig.xml";
-			}
-
-			if (File.Exists (appConfig)) {
-				appConfigDocument.Load (appConfig);
-				txtMAMEPath.Text = appConfigDocument.SelectSingleNode ("/config/mamedirectory").InnerText;
-				txtROMSPath.Text = appConfigDocument.SelectSingleNode ("/config/romsdirectory").InnerText;
-				txtSnapsPath.Text = appConfigDocument.SelectSingleNode ("/config/snapdirectory").InnerText;
-			} else {
-				Console.WriteLine ("appconfig.xml does not exist.");
-			}
-
 
 			if (filePath == null) {
 				if (IsLinux) {
@@ -238,8 +222,15 @@ namespace CabrioConfig
 			} else {
 				appConfig = Directory.GetCurrentDirectory() + "\\appconfig.xml";
 			}
+
 			if (File.Exists (appConfig)) {
 				appConfigDocument.Load (appConfig);
+				txtMAMEPath.Text = appConfigDocument.SelectSingleNode ("/config/mamedirectory").InnerText;
+				txtROMSPath.Text = appConfigDocument.SelectSingleNode ("/config/romsdirectory").InnerText;
+				txtSnapsPath.Text = appConfigDocument.SelectSingleNode ("/config/snapdirectory").InnerText;
+				this.btnScan.Enabled = true;
+			} else {
+				Console.WriteLine ("appconfig.xml does not exist.");
 			}
 
 			if (IsLinux) {
@@ -281,7 +272,7 @@ namespace CabrioConfig
 
 		private void toolStripButtonSave_Click (object sender, EventArgs e)
 		{
-			configDocument.Save (filePath);
+			this.SaveConfig ();
 		}
 
 		private void btnMAMEBrowse_Click (object sender, EventArgs e)
@@ -307,6 +298,7 @@ namespace CabrioConfig
 
 			if (this.folderBrowserDialog1.ShowDialog () == DialogResult.OK) {
 				this.txtROMSPath.Text = this.folderBrowserDialog1.SelectedPath;
+				this.btnScan.Enabled = true;
 			}
 		}
 
@@ -371,10 +363,15 @@ namespace CabrioConfig
 			string appConfig;
 
 			if (IsLinux) {
-				appConfig = Application.ExecutablePath + "/appconfig.xml";
+				appConfig = Directory.GetCurrentDirectory() + "/appconfig.xml";
 			} else {
-				appConfig = Application.ExecutablePath + "\\appconfig.xml";
+				appConfig = Directory.GetCurrentDirectory() + "\\appconfig.xml";
 			}
+
+			appConfigDocument.SelectSingleNode ("/config/mamedirectory").InnerText = txtMAMEPath.Text;
+			appConfigDocument.SelectSingleNode ("/config/romsdirectory").InnerText = txtROMSPath.Text;
+			appConfigDocument.SelectSingleNode ("/config/snapdirectory").InnerText = txtSnapsPath.Text;
+
 			appConfigDocument.Save (appConfig);
 			configDocument.Save (filePath);
 		}
@@ -543,7 +540,9 @@ namespace CabrioConfig
 				}
 				tempListItem [0] ["Description"] = ROMDescription;
 				gameList.Tables ["GameList"].AcceptChanges ();
+				this.btnDelete.Enabled = true;
 			}
+
 
 			this.dataGridView1.Update ();
 			statusText = "Done";
@@ -589,6 +588,7 @@ namespace CabrioConfig
 					
 					gameList.Tables ["GameList"].Rows.Add (tempRow);
 				}
+				this.btnLookup.Enabled = true;
 			}
 			
 			this.dataGridView1.DataSource = gameList.Tables ["GameList"];
