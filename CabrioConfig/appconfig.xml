@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<config>
+	<mamedirectory>c:\users\jim\.mame</mamedirectory>
+	<romsdirectory>c:\users\jim\.mame\roms</romsdirectory>
+	<snapdirectory>c:\users\jim\.mame\snap</snapdirectory>
+</config>
