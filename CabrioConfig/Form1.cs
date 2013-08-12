@@ -139,7 +139,6 @@ namespace CabrioConfig
 		private const string LinDirSeparator = "/";
 		private const string WinDirSeparator = "\\";
 		private string DirSeparator;
-
 		XmlDocument appConfigDocument = new XmlDocument ();
 		XmlDocument configDocument = new XmlDocument ();
 		XmlDocument mameDocument = new XmlDocument ();
@@ -215,12 +214,12 @@ namespace CabrioConfig
 		public void LoadConfig ()
 		{
 			string appConfig;
-			Console.WriteLine (Directory.GetCurrentDirectory());
+			Console.WriteLine (Directory.GetCurrentDirectory ());
 
 			if (IsLinux) {
-				appConfig = Directory.GetCurrentDirectory() + "/appconfig.xml";
+				appConfig = Directory.GetCurrentDirectory () + "/appconfig.xml";
 			} else {
-				appConfig = Directory.GetCurrentDirectory() + "\\appconfig.xml";
+				appConfig = Directory.GetCurrentDirectory () + "\\appconfig.xml";
 			}
 
 			if (File.Exists (appConfig)) {
@@ -363,13 +362,12 @@ namespace CabrioConfig
 			string appConfig;
 
 			if (IsLinux) {
-				appConfig = Directory.GetCurrentDirectory() + "/appconfig.xml";
+				appConfig = Directory.GetCurrentDirectory () + "/appconfig.xml";
 			} else {
-				appConfig = Directory.GetCurrentDirectory() + "\\appconfig.xml";
+				appConfig = Directory.GetCurrentDirectory () + "\\appconfig.xml";
 			}
 
-			if (appConfigDocument.ChildNodes.Count == 0)
-			{
+			if (appConfigDocument.ChildNodes.Count == 0) {
 				appConfigDocument.Load (appConfig);
 			}
 
@@ -410,7 +408,8 @@ namespace CabrioConfig
 				gameList.Tables.Add (myTable);
 			}
 
-			XmlNodeList xmlGameList = configDocument.SelectNodes ("/cabrio-config/game-list/games/game");
+			XmlNodeList xmlGameList = configDocument.SelectNodes ("/" + tag_root + "/" + tag_game_list + "/"
+			                                                       + tag_games + "/" + tag_game);
 			Console.WriteLine (configDocument.ChildNodes.Count);
 			if (configDocument.ChildNodes.Count == 0) {
 				this.ReadConfig ();
@@ -481,9 +480,10 @@ namespace CabrioConfig
 				this.toolStripProgressBar1.Value = Convert.ToInt16 (statusCount / dirList.Length);
 				Application.DoEvents ();
 				Console.WriteLine ("ROM :" + romName);
-				tempNode = configDocument.SelectSingleNode ("/cabrio-config/game-list/games/game[rom-image=\"" +
-					romName + "\"]");
-				//Console.WriteLine(tempNode.ToString());
+				tempNode = configDocument.SelectSingleNode ("/" + tag_root + "/" + 
+				                                            tag_game_list + "/" + tag_games + 
+				                                            "/"  + tag_game + "[" + 
+				                                            tag_game_rom_image + "='" + romName + "']");
 				if (tempNode == null) { //Then create new entry
 					shortROMName = System.IO.Path.GetFileNameWithoutExtension (romName);
 					Console.WriteLine ("ROM Short Name: " + shortROMName);
@@ -609,9 +609,12 @@ namespace CabrioConfig
 
 		protected void DeleteLine (string ROMName)
 		{
-			if (configDocument.ChildNodes [ChildIndexConfig].ChildNodes [ChildIndexGameList].ChildNodes [ChildIndexGames].ChildNodes.Count > 0) {
-				XmlNode DeleteNode = configDocument.SelectSingleNode ("/cabrio-config/game-list/games/game[rom-image=\"" +
-					ROMName + "\"]");
+			if (configDocument.ChildNodes [ChildIndexConfig].ChildNodes [ChildIndexGameList]
+			    .ChildNodes [ChildIndexGames].ChildNodes.Count > 0) {
+				XmlNode DeleteNode = configDocument.SelectSingleNode ("/" + tag_root + "/"
+				                                                      + tag_game_list + "/" + tag_games
+				                                                       + "/"  + tag_game + "[" + tag_game_rom_image
+				                                                       + "=\"" + ROMName + "\"]");
 				Console.WriteLine (DeleteNode.Name);
 				if (DeleteNode != null) {
 					DeleteNode.ParentNode.RemoveChild (DeleteNode);
