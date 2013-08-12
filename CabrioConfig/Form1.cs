@@ -368,6 +368,11 @@ namespace CabrioConfig
 				appConfig = Directory.GetCurrentDirectory() + "\\appconfig.xml";
 			}
 
+			if (appConfigDocument.ChildNodes.Count == 0)
+			{
+				appConfigDocument.Load (appConfig);
+			}
+
 			appConfigDocument.SelectSingleNode ("/config/mamedirectory").InnerText = txtMAMEPath.Text;
 			appConfigDocument.SelectSingleNode ("/config/romsdirectory").InnerText = txtROMSPath.Text;
 			appConfigDocument.SelectSingleNode ("/config/snapdirectory").InnerText = txtSnapsPath.Text;
@@ -562,6 +567,9 @@ namespace CabrioConfig
 
 		protected void populateListFromDirectory ()
 		{
+			Console.WriteLine (txtROMSPath.Text);
+			this.scanDirectory ();
+
 			if (gameList == null) {
 				Console.WriteLine ("Creating dataset");
 				gameList = new DataSet ();
