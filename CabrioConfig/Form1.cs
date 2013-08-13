@@ -528,8 +528,8 @@ namespace CabrioConfig
 					stringXML = stringXML + "</images>" + CrLf +
 						"<categories>" + CrLf +
 						"<category>" + CrLf +
-						"<name>Genre</name>" + CrLf +
-						"<value>Maze</value>" + CrLf +
+						"<name>Emulator</name>" + CrLf +
+						"<value>MAME</value>" + CrLf +
 						"</category>" + CrLf +
 						"</categories>" + CrLf +
 						"</game>" + CrLf;

@@ -2,7 +2,7 @@
 VERSION=0.1
 PACKAGE=cabrioconfig
 prefix=/usr/local
-config=RELEASE_X86
+config=DEBUG_X86
 configurations=" DEBUG_X86 RELEASE_X86"
 common_packages=""
 
