@@ -16,6 +16,12 @@ FolderChooserDialog has an issue with *nix hidden directories.  It is possible t
 from hidden directories if you manualy type in their path, but you cannot use the browser to do it.  
 You can also make 'soft' links to the hidden directories to work around it.
 
+Also you must have a basic cabrio config.xml in place.  Right now it looks in 
+HOME/.cabrio/config.xml
+
+This xml must at least have the tree down to <games></games>
+
+
 I need some help getting NodeView to work in GTK using the Stetic Form Designer.  Any help would be greatly 
 appreciated.
 
