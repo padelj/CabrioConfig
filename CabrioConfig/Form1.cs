@@ -180,7 +180,7 @@ namespace CabrioConfig
 				Console.WriteLine ("config XML Loaded");
 				int x = 0;
 				foreach (XmlNode tempNode in configDocument.ChildNodes) {
-					if (tempNode.Name == "cabrio-config") {
+					if (tempNode.Name == tag_root) {
 						ChildIndexConfig = x;
 						Console.WriteLine ("cabrio-config index: " + x);
 					}
@@ -189,7 +189,7 @@ namespace CabrioConfig
 
 				x = 0;
 				foreach (XmlNode tempNode in configDocument.ChildNodes[ChildIndexConfig].ChildNodes) {
-					if (tempNode.Name == "game-list") {
+					if (tempNode.Name == tag_game_list) {
 						ChildIndexGameList = x;
 						Console.WriteLine ("game-list index: " + x);
 					}
@@ -198,7 +198,7 @@ namespace CabrioConfig
 
 				x = 0;
 				foreach (XmlNode tempNode in configDocument.ChildNodes[ChildIndexConfig].ChildNodes[ChildIndexGameList].ChildNodes) {
-					if (tempNode.Name == "games") {
+					if (tempNode.Name == tag_games) {
 						ChildIndexGames = x;
 						Console.WriteLine ("games index: " + x);
 					}
@@ -376,7 +376,12 @@ namespace CabrioConfig
 			appConfigDocument.SelectSingleNode ("/config/snapdirectory").InnerText = txtSnapsPath.Text;
 
 			appConfigDocument.Save (appConfig);
-			configDocument.Save (filePath);
+
+			if (gameList.Tables.Count > 0) {
+				if (gameList.Tables ["GameList"].Rows.Count > 0) {
+					configDocument.Save (filePath);
+				}
+			}
 		}
 
 		protected void statusBarUpdateThread ()
@@ -480,7 +485,8 @@ namespace CabrioConfig
 				tempListItem = gameList.Tables ["GameList"].Select ("[ROM Name] = '" + romName + "'");
 				Console.WriteLine (tempListItem [0] [0].ToString ());
 				statusCount++;
-				this.toolStripProgressBar1.Value = Convert.ToInt16( 100 * (Convert.ToDouble (statusCount) / Convert.ToDouble (gameList.Tables["GameList"].Rows.Count)));
+				this.toolStripProgressBar1.Value = Convert.ToInt16( 100 * (Convert.ToDouble (statusCount) 
+				                                                           / Convert.ToDouble (gameList.Tables["GameList"].Rows.Count)));
 				Application.DoEvents ();
 				Console.WriteLine ("ROM :" + romName);
 				tempNode = configDocument.SelectSingleNode ("/" + tag_root + "/" + 
