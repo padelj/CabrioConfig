@@ -167,6 +167,14 @@ namespace CabrioConfig
 
 		protected void ReadConfig ()
 		{
+			if (IsLinux)
+			{
+				CrLf = LinCrLf;
+			}
+				else
+			{
+				CrLf = WinCrLf;
+			}
 
 			if (filePath == null) {
 				if (IsLinux) {
@@ -179,31 +187,70 @@ namespace CabrioConfig
 				configDocument.Load (filePath);
 				Console.WriteLine ("config XML Loaded");
 				int x = 0;
+				bool found = false;
 				foreach (XmlNode tempNode in configDocument.ChildNodes) {
 					if (tempNode.Name == tag_root) {
 						ChildIndexConfig = x;
+						found = true;
 						Console.WriteLine ("cabrio-config index: " + x);
 					}
 					x++;
 				}
 
 				x = 0;
+				found = false;
 				foreach (XmlNode tempNode in configDocument.ChildNodes[ChildIndexConfig].ChildNodes) {
 					if (tempNode.Name == tag_game_list) {
 						ChildIndexGameList = x;
+						found = true;
 						Console.WriteLine ("game-list index: " + x);
 					}
 					x++;
 				}
 
+				if (!found)
+				{
+					XmlNode newNode = configDocument.CreateElement("game-list");
+					Console.WriteLine (configDocument.ChildNodes[ChildIndexConfig].Name);
+					configDocument.ChildNodes[ChildIndexConfig].AppendChild ( newNode);
+
+					x = 0;
+					foreach (XmlNode tempNode in configDocument.ChildNodes[ChildIndexConfig].ChildNodes) {
+						if (tempNode.Name == tag_game_list) {
+							ChildIndexGameList = x;
+							found = true;
+							Console.WriteLine ("game-list index: " + x);
+						}
+						x++;
+					}
+				}
+
 				x = 0;
+				found = false;
 				foreach (XmlNode tempNode in configDocument.ChildNodes[ChildIndexConfig].ChildNodes[ChildIndexGameList].ChildNodes) {
 					if (tempNode.Name == tag_games) {
-						ChildIndexGames = x;
+						found = true;
 						Console.WriteLine ("games index: " + x);
 					}
 					x++;
 				}
+				if (!found)
+				{
+					XmlNode newNode = configDocument.CreateElement("games");
+					Console.WriteLine (configDocument.ChildNodes[ChildIndexConfig].ChildNodes[ChildIndexGameList].Name);
+					configDocument.ChildNodes[ChildIndexConfig].ChildNodes[ChildIndexGameList].AppendChild (newNode);
+					
+					x = 0;
+					foreach (XmlNode tempNode in configDocument.ChildNodes[ChildIndexConfig].ChildNodes[ChildIndexGameList].ChildNodes) {
+						if (tempNode.Name == tag_games) {
+							ChildIndexGames = x;
+							found = true;
+							Console.WriteLine ("games index: " + x);
+						}
+						x++;
+					}
+				}
+
 			} else {
 				Console.WriteLine ("Cabrio config file does not exist.");
 				this.toolStripStatusLabel1.Text = "Cabrio config file does not exist.";
