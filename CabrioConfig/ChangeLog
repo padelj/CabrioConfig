@@ -3,3 +3,10 @@
 	* Form1.cs: Setup the Menu Item Open to also import the
 	existing ROM list from XML.
 
+	* ChangeLog: 
+
+2013-08-14  James Padel  <james.padel@ucf.edu>
+
+	* Form1.cs: Setup the Menu Item Open to also import the
+	existing ROM list from XML.
+
