@@ -251,6 +251,8 @@ namespace CabrioConfig
 					}
 				}
 
+				this.populateListFromXML ();
+
 			} else {
 				Console.WriteLine ("Cabrio config file does not exist.");
 				this.toolStripStatusLabel1.Text = "Cabrio config file does not exist.";
