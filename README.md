@@ -26,13 +26,13 @@ appreciated.
 
 Required References
   Microsoft.CSharp
-  System
-  System.Core
-  System.Data
-  System.Data.DataSetExtensions
-  System.Drawing
-  System.Windows.Forms
-  System.Xml
-  System.Xml.Linq
+  System  
+  System.Core  
+  System.Data  
+  System.Data.DataSetExtensions  
+  System.Drawing  
+  System.Windows.Forms  
+  System.Xml  
+  System.Xml.Linq  
   
 Built with MonoDevelop/Xamian 4.0
