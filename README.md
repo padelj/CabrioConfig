@@ -4,7 +4,7 @@ CabrioConfig
 Version 0.9 Beta
 
 
-Mono compliant C# project for editing and updating the Cabrio-FE for emulators config.xml.
+#Mono compliant C# project for editing and updating the Cabrio-FE for emulators config.xml.
 
 Requires that you have created the mameinfo.xml file from the command
   
@@ -18,7 +18,6 @@ You can also make 'soft' links to the hidden directories to work around it.
 
 Also you must have a basic cabrio config.xml in place, by running cabrio the first time.  Right now it looks in 
 HOME/.cabrio/config.xml
-
 
 
 I need some help getting NodeView to work in GTK using the Stetic Form Designer.  Any help would be greatly 
