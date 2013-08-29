@@ -4,13 +4,14 @@ CabrioConfig
 Version 0.9 Beta
 
 
-#Mono compliant C# project for editing and updating the Cabrio-FE for emulators config.xml.
+##Mono compliant C# project for editing and updating the Cabrio-FE for emulators config.xml.
 
 Requires that you have created the mameinfo.xml file from the command
   
   mame -listxml >mameinfo.xml
   
-  
+Since this is being created with Mono in mind, it will run both the Windows Forms version and the GTK verison on
+both Windows AND linux.  
 The WinForms branch, of course, is basically working at this point.  But please be aware that WinForms' 
 FolderChooserDialog has an issue with *nix hidden directories.  It is possible to load and save files 
 from hidden directories if you manualy type in their path, but you cannot use the browser to do it.  
